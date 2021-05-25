@@ -23,6 +23,9 @@ function LoginAuth() {
                       if (!firestoreDocument.exists) {
                           alert("User does not exist anymore.")
                           return;
+                      } else if (!firebase.auth().currentUser.emailVerified) {
+                          alert("Email not verified!")
+                          firebase.auth().signOut()
                       }
                       //const user = firestoreDocument.data()
                       //console.log(user)

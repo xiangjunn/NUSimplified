@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Header, Content, Form, Item, Input, Icon, Button, Text, Body} from 'native-base';
+import { Container, Form} from 'native-base';
 import { StyleSheet, Image} from 'react-native';
 
 import LoginDetails from '../container/LoginAuth';

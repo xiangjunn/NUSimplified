@@ -8,7 +8,7 @@ import { StyleSheet } from 'react-native'
 import { firebase } from './firebase';
 import LoginScreen from './app/screens/LoginScreen';
 import RegistrationScreen from './app/screens/RegistrationScreen';
-import MainNavigator from './app/container/MainNavigator'
+import MainNavigator from './app/container/Main'
 
 
 
@@ -17,7 +17,7 @@ export default function App() {
   const [isReady, setReady] = useState(false);
   const [isSignedIn, setSignedIn] = useState(false);
   useEffect(() => firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
+    if (user != null && user.emailVerified) {
       setSignedIn(true);
     } else {
       setSignedIn(false);

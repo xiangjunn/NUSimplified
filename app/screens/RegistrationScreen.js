@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import { StyleSheet } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { useNavigation } from '@react-navigation/native'
 import { firebase } from '../../firebase'
-import { Container, Content, Form, Item, Input, Icon, Button, Text, Label } from 'native-base';
+import { Container, Content, Form, Item, Input, Button, Text, Label } from 'native-base';
 
 export default function RegistrationScreen() {
     const navigation = useNavigation();
@@ -28,7 +27,14 @@ export default function RegistrationScreen() {
 
 
     const onRegisterPress = () => {
-        if (password !== confirmPassword) {
+        // check if all text fields are filled
+        if (!(firstName && lastName && email && password && confirmPassword)) {
+            alert("Please fill up all text fields.")
+            return
+        } else if (!email.endsWith("@u.nus.edu")) { // check if it is NUS registered email
+            alert("This is not a NUS registered email!")
+            return
+        } else if (password !== confirmPassword) {
             alert("Passwords don't match.")
             return
         }
@@ -48,6 +54,17 @@ export default function RegistrationScreen() {
                     .doc(uid)
                     .set(data)
                     .then(() => {
+                        firebase.auth().currentUser.sendEmailVerification()
+                        .then(function() {
+                          // Verification email sent.
+                          console.log("SENT")
+                          firebase.auth().signOut()
+                          navigation.replace('Login')
+                        })
+                        .catch(function(error) {
+                        // Error occurred. Inspect error.code.
+                            console.log(error)
+                        });
                     })
                     .catch((error) => {
                         alert(error)

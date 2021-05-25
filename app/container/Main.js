@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem, Toast } from '@react-navigation/drawer';
 import HomeScreen from '../screens/HomeScreen';
 import BookingScreen from '../screens/BookingScreen';
 import BorrowScreen from '../screens/BorrowScreen';
 import RemindersScreen from '../screens/RemindersScreen';
-import { Button, Form, Label, View, Icon } from 'native-base';
+import { View, Icon } from 'native-base';
 import { firebase } from '../../firebase'
 
 function CustomDrawerContent(props) {
@@ -38,7 +38,7 @@ function CustomDrawerContent(props) {
         });}} />
 
       </DrawerContentScrollView>
-      <View style={{flex: 1, justifyContent: 'flex-end'}}>
+      <View style={{flex: 0.5, justifyContent: 'flex-end'}}>
           <DrawerItem labelStyle='' inactiveTintColor='red' label="Log out" style={{ justifyContent: 'center'}}
           icon={({color, size}) => (
             <Icon 

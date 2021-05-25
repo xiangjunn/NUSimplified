@@ -1,9 +1,6 @@
 import { Container, Content, Footer, FooterTab, Button, Text, Icon, Label, Header, Body, Left, Right } from 'native-base';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native'
-import { firebase } from '../../firebase'
-import ControlPanel from '../container/ControlPanel'
 
 function HomeScreen({route, navigation}) {
     //const navigation = useNavigation();
