@@ -57,7 +57,7 @@ export default function RegistrationScreen() {
                         firebase.auth().currentUser.sendEmailVerification()
                         .then(function() {
                           // Verification email sent.
-                          console.log("SENT")
+                          alert("Registration successful! An email verification has been sent to your email address.")
                           firebase.auth().signOut()
                           navigation.replace('Login')
                         })
