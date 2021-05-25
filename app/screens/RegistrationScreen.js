@@ -27,11 +27,16 @@ export default function RegistrationScreen() {
 
 
     const onRegisterPress = () => {
+        // remove whitespaces for first name, last name and email
+        const firstNameModified = firstName.trim()
+        const lastNameModified = lastName.trim()
+        const emailModified = email.toLowerCase().trim()
+
         // check if all text fields are filled
-        if (!(firstName && lastName && email && password && confirmPassword)) {
+        if (!(firstNameModified && lastNameModified && emailModified && password && confirmPassword)) {
             alert("Please fill up all text fields.")
             return
-        } else if (!email.endsWith("@u.nus.edu")) { // check if it is NUS registered email
+        } else if (!emailModified.endsWith("@u.nus.edu")) { // check if it is NUS registered email
             alert("This is not a NUS registered email!")
             return
         } else if (password !== confirmPassword) {
@@ -40,14 +45,14 @@ export default function RegistrationScreen() {
         }
         firebase
             .auth()
-            .createUserWithEmailAndPassword(email, password)
+            .createUserWithEmailAndPassword(emailModified, password)
             .then((response) => {
                 const uid = response.user.uid
                 const data = {
                     id: uid,
-                    email,
-                    firstName,
-                    lastName
+                    email: emailModified,
+                    firstName: firstNameModified,
+                    lastName: lastNameModified
                 };
                 const usersRef = firebase.firestore().collection('users')
                 usersRef
@@ -105,6 +110,7 @@ export default function RegistrationScreen() {
                     {display('Email', emailTitle)}
                     <Item rounded last style={styles.textbox}>
                         <Input
+                        keyboardType='email-address'
                         placeholder='Email'
                         underlineColorAndroid="transparent"
                         onChangeText={(text) => {setEmail(text); setEmailTitle(text !== '')}}

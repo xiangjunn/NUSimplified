@@ -12,7 +12,7 @@ function LoginAuth() {
     const onLoginPress = () => {
       firebase
           .auth()
-          .signInWithEmailAndPassword(email, password)
+          .signInWithEmailAndPassword(email.toLowerCase().trim(), password)
           .then((response) => {
               const uid = response.user.uid
               const usersRef = firebase.firestore().collection('users')
@@ -47,6 +47,7 @@ function LoginAuth() {
               <Item rounded last>
                 <Icon type='FontAwesome5' name='envelope' />
                 <Input
+                  keyboardType='email-address'
                   placeholder='Email'
                   underlineColorAndroid="transparent"
                   onChangeText={(text) => setEmail(text)}
