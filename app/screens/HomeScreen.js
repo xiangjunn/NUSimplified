@@ -29,6 +29,7 @@ function HomeScreen({route, navigation}) {
             </Header>
           <Content>
             <Label>Home - Not implemented yet</Label>
+            <Button onPress={() => console.log("BYR")}><Text>HI</Text></Button>
           </Content>
           <Footer style={{backgroundColor: '#62B1F6'}}>
             <FooterTab>

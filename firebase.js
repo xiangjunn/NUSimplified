@@ -1,16 +1,18 @@
 import * as firebase from 'firebase';
 import '@firebase/auth';
 import '@firebase/firestore';
-import {API_KEY, PROJECT_NAME, MESSAGING_SENDER_ID, APP_ID} from '@env'
+import {API_KEY, AUTH_DOMAIN, DATABASE_URL, PROJECT_ID,
+  STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID, MEASUREMENT_ID} from '@env'
 
 const firebaseConfig = {
   apiKey: API_KEY,
-  authDomain: PROJECT_NAME + '.firebaseapp.com',
-  databaseURL: 'https://' + PROJECT_NAME +'.firebaseio.com',
-  projectId: PROJECT_NAME,
-  storageBucket: PROJECT_NAME + '.appspot.com',
+  authDomain: AUTH_DOMAIN,
+  databaseURL: DATABASE_URL,
+  projectId: PROJECT_ID,
+  storageBucket: STORAGE_BUCKET,
   messagingSenderId: MESSAGING_SENDER_ID,
   appId: APP_ID,
+  measurementId: MEASUREMENT_ID
 };
 
 if (!firebase.apps.length) {

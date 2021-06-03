@@ -8,7 +8,7 @@ import { StyleSheet } from 'react-native'
 import { firebase } from './firebase';
 import LoginScreen from './app/screens/LoginScreen';
 import RegistrationScreen from './app/screens/RegistrationScreen';
-import MainNavigator from './app/container/Main'
+import MainNavigator from './app/container/MainNavigator'
 
 
 
