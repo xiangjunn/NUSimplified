@@ -1,11 +1,12 @@
 import React from 'react';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem, Toast } from '@react-navigation/drawer';
-import HomeScreen from '../screens/HomeScreen';
+import HomeNavigator from '../container/HomeNavigator';
 import BookingScreen from '../screens/BookingScreen';
 import RemindersScreen from '../screens/RemindersScreen';
 import { View, Icon } from 'native-base';
 import { firebase } from '../../firebase'
 import BorrowNavigator from '../container/BorrowNavigator';
+import DeclareTempScreen from '../screens/DeclareTempScreen'
 
 function CustomDrawerContent(props) {
     const uid = firebase.auth().currentUser.uid;
@@ -59,8 +60,12 @@ function MainNavigator() {
     
 
     return (
-        <Drawer.Navigator backBehavior="none" drawerType='slide' drawerContent={props => <CustomDrawerContent {...props} />}>
-          <Drawer.Screen name="Home" component={HomeScreen} />
+        <Drawer.Navigator 
+          backBehavior="none"
+          drawerType='slide'
+          screenOptions={{swipeEnabled: false}}
+          drawerContent={props => <CustomDrawerContent {...props} />}>
+          <Drawer.Screen name="Home" component={HomeNavigator} />
           <Drawer.Screen name="Booking" component={BookingScreen} />
           <Drawer.Screen name="Borrow" component={BorrowNavigator} />
           <Drawer.Screen name="Reminder" component={RemindersScreen} />

@@ -1,8 +1,8 @@
-import { Container, Content, Footer, FooterTab, Button, Text, Icon, Header, Body, Left, Right, Label, List, ListItem, Thumbnail, Form } from 'native-base';
+import { Container, Footer, FooterTab, Button, Text, Icon, Header, Body, Left, Right, Label, List, ListItem, Thumbnail, Form } from 'native-base';
 import React, { useState, useEffect} from 'react';
 import { Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
-import { firebase } from '../../firebase'
+import { LinearGradient } from 'expo-linear-gradient';
 
 function BorrowScreen() {
     const navigation = useNavigation();
@@ -10,46 +10,6 @@ function BorrowScreen() {
     const bookingStyle = styles.others;
     const borrowStyle = styles.selected;
     const remindersStyle = styles.others;
-
-    const [data, setData] = useState([]);
-
-    function displayAuthors(authors) {
-      const length = authors.length;
-      if (length == 0) {
-        return; // no author
-      }
-      if (length == 1) {
-        return (<Text>{"Author: " + authors[0]}</Text>)
-      } else {
-        return (<Text>{"Authors: " + authors[0] + " & " + (length - 1) + " more"}</Text>)
-      }
-    }
-    
-    useEffect(() => {
-      firebase.firestore().collection('library').get()
-        .then(query => {
-          setData(query.docs.map(doc => {
-            const book = doc.data();
-            const id = doc.id;
-            return (<ListItem
-              onPress={() => navigation.navigate('BookDetails', {book, id})}
-              style={{height: 120, marginTop: 30, marginRight: 10}}
-              thumbnail
-              key={doc.id}>
-              <Form style={{flex: 3}}>
-                <Image style={{resizeMode: 'stretch', flex: 1}} source={{ uri: book.thumbnailUrl }} />
-              </Form>
-              <Form style={{flex: 10, height: 120, marginLeft: 5}}>
-                <Text style={{fontWeight: 'bold', color: '#0645AD'}}>{book.title}</Text>
-                {displayAuthors(book.authors)}
-                <Text note>{"Number of pages: " + book.pageCount}</Text>
-                <Text note numberOfLines={1}>{"Published " + book.publishedDate.year}</Text>
-              </Form>
-            </ListItem>)}))
-        })
-      }, []);
-
-
 
     return (
         <Container >
@@ -62,11 +22,28 @@ function BorrowScreen() {
           <Body/>
           <Right/>
             </Header>
-          <Content>
-          <List>
-            {data}
-          </List>
-          </Content>
+          <Form style={{flex: 1, justifyContent: 'center'}}>
+          <LinearGradient
+        colors={['#ff7e5f', '#feb47b']}
+        start={[0, 1]}
+        end={[1, 0]}
+        style={styles.view}>
+          <Button transparent style={styles.button} onPress={() => navigation.navigate('Browse')}>
+          <Label  style={[styles.text, {color: 'black'}]}>Browse</Label>
+          <Icon type='FontAwesome5' name='search' style={[styles.icon, {color: 'black'}]}/>
+          </Button>
+        </LinearGradient>
+          <LinearGradient
+        colors={['#42275a', '#734b6d']}
+        start={[0, 1]}
+        end={[1, 0]}
+        style={styles.view}>
+          <Button transparent style={styles.button} onPress={() => navigation.navigate('Loan')}>
+          <Label style={[styles.text, {color: 'white'}]}>Book Loans</Label>
+          <Icon type='FontAwesome5' name='book' style={[styles.icon, {color: 'white'}]}/>
+          </Button>
+        </LinearGradient>
+          </Form>
           <Footer style={{backgroundColor: '#62B1F6'}}>
             <FooterTab>
               <Button info onPress={() => navigation.navigate("Home")}>
@@ -100,6 +77,32 @@ const styles = StyleSheet.create({
     },
     others: {
         color: 'white'
+    },
+    view: {
+      width: '80%',
+      height: '40%',
+      alignSelf: 'center',
+      justifyContent: 'center',
+      margin: '7%',
+      borderRadius: 40
+    },
+    text: {
+      textAlign: 'center',
+      fontSize: 40,
+      fontWeight: 'bold'
+    },
+    icon: {
+      alignSelf: 'center',
+      fontSize: 100,
+      marginTop: 20
+    },
+    button: {
+      flex: 1,
+      width: '100%',
+      flexDirection: 'column',
+      alignSelf: 'center',
+      justifyContent: 'center',
+      borderRadius: 40
     }
 });
 

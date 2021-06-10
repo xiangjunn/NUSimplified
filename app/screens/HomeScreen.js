@@ -1,18 +1,28 @@
-import { Container, Content, Footer, FooterTab, Button, Text, Icon, Label, Header, Body, Left, Right } from 'native-base';
+import { Container, Content, Footer, FooterTab, Button, Text, Icon, Label, Header, Body, Left, Right, Form } from 'native-base';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native'
+import { firebase } from '../../firebase'
 
-function HomeScreen({route, navigation}) {
-    //const navigation = useNavigation();
+function HomeScreen() {
+    const navigation = useNavigation();
     const homeStyle = styles.selected;
     const bookingStyle = styles.others;
     const borrowStyle = styles.others;
     const remindersStyle = styles.others;
     const [name, setName] = useState('hi')
+    const uid = firebase.auth().currentUser.uid;
+    const db = firebase.firestore();  
+    const docRef = db.collection("users").doc(uid);
+
+
+
     useEffect(() => {
-      if (route.params != undefined) {
-        setName(route.params.user.fullName);
-      }
+      docRef.get().then(doc => {
+        const data = doc.data();
+        const fullName = data.firstName + ' ' + data.lastName;
+        setName(fullName);
+      })
       return () => console.log('unmounting...');
     }, []) 
 
@@ -28,8 +38,13 @@ function HomeScreen({route, navigation}) {
           <Right/>
             </Header>
           <Content>
-            <Label>Home - Not implemented yet</Label>
-            <Button onPress={() => console.log("BYR")}><Text>HI</Text></Button>
+            <Label style={{fontSize: 30, color: '#000033', margin: 10}}>{'Hello ' + name}</Label>
+            <Form style={{height: 130, width: '30%', margin: 25}}>
+            <Button onPress={() => navigation.navigate("HealthDeclaration")} style={{flex: 2, borderRadius: 20}}>
+              <Icon style={{fontSize: 70, flex: 1, textAlign: 'center'}} type='FontAwesome5' name="thermometer-half"></Icon>
+            </Button>
+            <Label style={{flex: 1, fontSize: 15, textAlign: 'center', fontWeight: 'bold'}}>{'Health\nDeclaration'}</Label>
+            </Form>
           </Content>
           <Footer style={{backgroundColor: '#62B1F6'}}>
             <FooterTab>

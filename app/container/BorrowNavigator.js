@@ -2,8 +2,10 @@ import React from 'react';
 import { Image, StyleSheet } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import BorrowScreen from '../screens/BorrowScreen';
-import BookDetailsScreen from '../screens/BookDetailsScreen';
+import BorrowScreen from '../screens/borrow/BorrowScreen';
+import BrowseBooksScreen from '../screens/borrow/BrowseBooksScreen';
+import BookDetailsScreen from '../screens/borrow/BookDetailsScreen';
+import LoanScreen from '../screens/borrow/LoanScreen';
 
 
 export default function BorrowNavigator() {
@@ -15,6 +17,22 @@ export default function BorrowNavigator() {
             component={BorrowScreen}
             options={{
                 headerShown: false
+            }}
+            />
+
+        <Stack.Screen
+            name="Browse"
+            component={BrowseBooksScreen}
+            options={{
+                title: 'Browse',
+            }}
+            />
+
+        <Stack.Screen
+            name="Loan"
+            component={LoanScreen}
+            options={{
+                title: 'Loans',
             }}
             />
 

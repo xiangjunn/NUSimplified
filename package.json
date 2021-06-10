@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@react-native-community/masked-view": "0.1.10",
+    "@react-native-community/slider": "^3.0.3",
     "@react-navigation/bottom-tabs": "^5.11.11",
     "@react-navigation/drawer": "^5.12.5",
     "@react-navigation/native": "^5.9.4",
@@ -17,10 +18,13 @@
     "expo": "~41.0.1",
     "expo-app-loading": "^1.0.3",
     "expo-font": "~9.1.0",
+    "expo-linear-gradient": "~9.1.0",
     "expo-status-bar": "~1.0.4",
     "express": "^4.17.1",
     "firebase": "^8.2.3",
     "native-base": "^2.15.2",
+    "path": "^0.12.7",
+    "querystring": "^0.2.1",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-41.0.0.tar.gz",
@@ -31,7 +35,8 @@
     "react-native-reanimated": "~2.1.0",
     "react-native-safe-area-context": "3.2.0",
     "react-native-screens": "~3.0.0",
-    "react-native-web": "~0.13.12"
+    "react-native-web": "~0.13.12",
+    "zlib": "^1.0.5"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0"

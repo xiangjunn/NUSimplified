@@ -1,7 +1,7 @@
 import { Container, Content, Footer, FooterTab, Button, Text, Icon, Radio, Body, Left, Right, Label, List, ListItem, Thumbnail, Form } from 'native-base';
 import React, { useState, useEffect} from 'react';
 import { Image, StyleSheet, Modal, View, Alert } from 'react-native';
-import { firebase } from '../../firebase';
+import { firebase } from '../../../firebase';
 
 export default function BookDetailsScreen({ route, navigation }) {
     const {book} = route.params;
@@ -11,7 +11,6 @@ export default function BookDetailsScreen({ route, navigation }) {
     const [quota, setQuota] = useState();
     const [modalVisible, setModalVisible] = useState(false);
     const [borrowed, setBorrowed] = useState(false);
-    const [length, setLength] = useState(undefined); // how many books the user has borrowed
 
     function borrow(library) {
         if (quota > 0) {
@@ -41,13 +40,17 @@ export default function BookDetailsScreen({ route, navigation }) {
             });
             const borrowedDate = firebase.firestore.Timestamp.now().toDate();
             const dueDate = extendDate(borrowedDate, 14);
-            recordUser(library, borrowedDate, dueDate);
 
             Alert.alert("Successful!",
                 "The book will be available for collection at "
                 + library
                 + " on the next working day.\nPlease return it by "
-                + dateToString(dueDate) + ".");
+                + dateToString(dueDate) + ".",
+                [{
+                  text: "OK",
+                  onPress: () => recordUser(library, borrowedDate, dueDate),
+                  style: "cancel"
+                }]);
             setModalVisible(!modalVisible);
         } else if (currQuota === 0) {
             Alert.alert("Failed to borrow book", "The book may have already been borrowed by someone else. Please try again.");
@@ -95,7 +98,6 @@ export default function BookDetailsScreen({ route, navigation }) {
                 const userBooks = doc.get("borrowedBooks");
                 if (userBooks) {
                     const len = userBooks.length;
-                    setLength(len);
                     for (let i = 0; i < len; i++) {
                         if (userBooks[i].id === id) {
                             setBorrowed(true);
@@ -142,7 +144,7 @@ export default function BookDetailsScreen({ route, navigation }) {
             <Footer style={{backgroundColor: '#62B1F6'}}>
                 {borrowed
                     ? <Button disabled style={styles.button}>
-                        <Text style={{textAlign: 'center', flex: 1, color: 'black'}}>BORROW</Text>
+                        <Text style={{textAlign: 'center', flex: 1, color: 'black'}}>BORROWED</Text>
                       </Button>
                     : 
                       <Button warning onPress={() => setModalVisible(!modalVisible)} style={styles.button}>
