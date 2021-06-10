@@ -39,7 +39,7 @@ export default function LoanScreen() {
                       <Text style={styles.text}>Return</Text>
                   </Button>
                   <Button warning style={styles.button} onPress={() => alert("why always not implemented yet???")}>
-                      <Text style={[styles.text, {color: 'black'}]}>Extend date</Text>
+                      <Text style={[styles.text, {color: 'black'}]}>Extend</Text>
                   </Button>
                   </Form>
             </Form>
@@ -59,7 +59,9 @@ export default function LoanScreen() {
             const borrowedBooks = query.get("borrowedBooks");
             if (borrowedBooks) {
                 createComponents(borrowedBooks).then((components) => setData(components))
-            }
+            } else {
+                setData(<Text>You have no book on loan.</Text>)
+            } 
             })}, []);
 
     return (

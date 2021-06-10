@@ -43,7 +43,7 @@ function HomeScreen() {
             <Button onPress={() => navigation.navigate("HealthDeclaration")} style={{flex: 2, borderRadius: 20}}>
               <Icon style={{fontSize: 70, flex: 1, textAlign: 'center'}} type='FontAwesome5' name="thermometer-half"></Icon>
             </Button>
-            <Label style={{flex: 1, fontSize: 15, textAlign: 'center', fontWeight: 'bold'}}>{'Health\nDeclaration'}</Label>
+            <Label style={{flex: 1, fontSize: 15, textAlign: 'center', fontWeight: 'bold', marginTop: 5}}>{'Health\nDeclaration'}</Label>
             </Form>
           </Content>
           <Footer style={{backgroundColor: '#62B1F6'}}>

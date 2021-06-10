@@ -16,14 +16,14 @@ export default function HealthDeclaration() {
           heading={
             <TabHeading style={{backgroundColor: '#62B1F6'}}>
                 <Icon type='FontAwesome5' name="thermometer-half" style={{color: 'black'}}/>
-                <Text style={{color: 'black'}}>Declare Temperature</Text>
+                <Text style={{color: 'black', fontWeight: 'bold'}}>Declare</Text>
             </TabHeading>}>
             <DeclareTempScreen />
           </Tab>
           <Tab heading={
             <TabHeading style={{backgroundColor: '#62B1F6'}}>
                 <Icon type='FontAwesome' name="history" style={{color: 'black'}}/>
-                <Text style={{color: 'black'}}>History</Text>
+                <Text style={{color: 'black', fontWeight: 'bold'}}>History</Text>
             </TabHeading>}>
             <TemperatureHistory />
           </Tab>

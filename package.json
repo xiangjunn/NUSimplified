@@ -14,8 +14,7 @@
     "@react-navigation/drawer": "^5.12.5",
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.4",
-    "body-parser": "^1.19.0",
-    "expo": "~41.0.1",
+    "expo": "^41.0.1",
     "expo-app-loading": "^1.0.3",
     "expo-font": "~9.1.0",
     "expo-linear-gradient": "~9.1.0",
@@ -31,12 +30,11 @@
     "react-native-dotenv": "^2.5.5",
     "react-native-gesture-handler": "~1.10.2",
     "react-native-keyboard-aware-scroll-view": "^0.9.4",
-    "react-native-my-sql-connection": "^1.0.4",
     "react-native-reanimated": "~2.1.0",
     "react-native-safe-area-context": "3.2.0",
     "react-native-screens": "~3.0.0",
     "react-native-web": "~0.13.12",
-    "zlib": "^1.0.5"
+    "react-zlib-js": "^1.0.5"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0"

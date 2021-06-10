@@ -15,13 +15,13 @@ export default function BookDetailsScreen({ route, navigation }) {
     function borrow(library) {
         if (quota > 0) {
             Alert.alert("Borrow", "You have chosen to collect your book at " + library + "\n\nProceed to borrow?",
-            [
+            [   { text: "No" },
                 {
                   text: "Yes",
                   onPress: () => recordBook(library),
                   style: "cancel"
-                },
-                { text: "No" }
+                }
+                
               ])
             
         } else {
@@ -48,10 +48,12 @@ export default function BookDetailsScreen({ route, navigation }) {
                 + dateToString(dueDate) + ".",
                 [{
                   text: "OK",
-                  onPress: () => recordUser(library, borrowedDate, dueDate),
+                  onPress: () => {
+                    recordUser(library, borrowedDate, dueDate);
+                    setModalVisible(!modalVisible);},
                   style: "cancel"
                 }]);
-            setModalVisible(!modalVisible);
+            
         } else if (currQuota === 0) {
             Alert.alert("Failed to borrow book", "The book may have already been borrowed by someone else. Please try again.");
         } else if (arr != undefined && arr.length === maxBooksBorrowed) {

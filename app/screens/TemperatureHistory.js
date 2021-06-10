@@ -1,27 +1,123 @@
-import { Container, Content, Button, Text, Icon, Header, Body, Left, Right, Label } from 'native-base';
-import React from 'react';
+import { Container, Content, Button, Text, Icon, Form, List, ListItem } from 'native-base';
+import React, { useState, useEffect} from 'react';
 import { StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native'
-import Slider from '@react-native-community/slider';
+import { firebase } from '../../firebase';
 
 function TemperatureHistory() {
+  const [temperatureInfo, setTemperatureInfo] = useState([])
+
+  const userId = firebase.auth().currentUser.uid;
+
+  function dateToString(date) {
+    const dd = date.getDate();
+    const mm = date.getMonth() + 1;
+    const y = date.getFullYear();
+
+    return dd + '/'+ mm + '/'+ y;
+  }
+
+  function getTime(date) {
+    let hr = date.getHours();
+    let min = date.getMinutes();
+    hr = hr < 10 ? '0' + hr : hr.toString(); 
+    min = min < 10 ? '0' + min : min.toString(); 
+    return hr + ':'+ min;
+  }
+
+  function getDay(date) {
+    const map = {
+      0: 'Sunday',
+      1: 'Monday',
+      2: 'Tuesday',
+      3: 'Wednesday',
+      4: 'Thursday',
+      5: 'Friday',
+      6: 'Saturday'
+    }
+    return map[date.getDay()]
+  }
+
+  async function createComponents(temperatureHistory) {
+    let components = [];
+    for (let i = temperatureHistory.length - 1; i >= 0; i--) {
+      const record = temperatureHistory[i];
+        const temperature = record.temperature;
+        const date = record.timestamp.toDate();
+        const isNormal = record.isNormal;
+        components.push(
+        <ListItem
+        style={{height: 70, marginVertical: 10, marginRight: 10, borderBottomColor: 'grey', borderBottomWidth: 2}}
+        key={i}>
+        <Form style={styles.list}>
+              <Text style={styles.listText}>
+                {dateToString(date) + '\n' + getDay(date) + '\n' + getTime(date)}
+              </Text>
+              <Text style={[styles.listText, temperature >= 37.5 ? {color: 'red'} : {}]}>
+                {temperature.toFixed(1)}
+              </Text>
+              <Text style={styles.listText}>
+                {isNormal ? '-' : 'Above\nnormal'}
+              </Text>
+            </Form>
+      </ListItem>
+        )}
+    return components; 
+}
+  
+  useEffect(() => {
+    const subscriber = firebase.firestore().collection('users').doc(userId).onSnapshot(query => {
+          const temperatureHistory = query.get("temperatureHistory");
+          if (temperatureHistory) {
+              createComponents(temperatureHistory).then((components) => setTemperatureInfo(components))
+          }
+          })
+  return () => subscriber();
+  }, []);
+
     return (
         <Container >
-     
           <Content>
-          <Slider
-    style={{width: 200, height: 40}}
-    minimumValue={0}
-    maximumValue={1}
-    minimumTrackTintColor="#FFFFFF"
-    maximumTrackTintColor="#000000"
-  />
+            <Form style={styles.header}>
+              <Text style={styles.headerText}>
+                Date
+              </Text>
+              <Text style={styles.headerText}>
+                Temperature
+              </Text>
+              <Text style={styles.headerText}>
+                Remarks
+              </Text>
+            </Form>
+            <List>
+            {temperatureInfo}
+            </List>
           </Content>
         </Container>
     );
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    borderBottomWidth: 2,
+    borderBottomColor: 'black',
+    marginTop: 10
+  },
+  headerText: {
+    flex: 1,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 20
+  },
+  list: {
+    flexDirection: 'row',
+  },
+  listText: {
+    height: '100%',
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 18
+  }
 });
 
 export default TemperatureHistory;

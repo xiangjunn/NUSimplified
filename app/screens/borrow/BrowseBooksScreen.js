@@ -1,11 +1,12 @@
 import { Container, Content, Footer, FooterTab, Button, Text, Icon, Header, Body, Left, Right, Label, List, ListItem, Thumbnail, Form } from 'native-base';
-import React, { useState, useEffect} from 'react';
-import { Image, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firebase } from '../../../firebase';
 
 function BrowseBooksScreen() {
     const navigation = useNavigation();
+    const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
 
     function displayAuthors(authors) {
@@ -41,9 +42,13 @@ function BrowseBooksScreen() {
                 <Text note numberOfLines={1}>{"Published " + book.publishedDate.$date.split('-')[0]}</Text>
               </Form>
             </ListItem>)}))
+            setLoading(false);
         })
       }, []);
 
+    if (loading) {
+      return <ActivityIndicator animating={true} size="large" style={{opacity:1}} color="#999999" />
+    }
 
 
     return (
