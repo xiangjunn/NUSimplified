@@ -1,4 +1,4 @@
-import { Container, Content, Footer, FooterTab, Button, Text, Icon, Radio, Body, Left, Right, Label, List, ListItem, Thumbnail, Form } from 'native-base';
+import { Container, Content, Footer, FooterTab, Button, Text, Input, Item, List, ListItem, Thumbnail, Form } from 'native-base';
 import React, { useState, useEffect} from 'react';
 import { Image, StyleSheet, Modal, View, Alert } from 'react-native';
 import { firebase } from '../../../firebase';
@@ -6,6 +6,9 @@ import { firebase } from '../../../firebase';
 export default function LoanScreen() {
     const [data, setData] = useState([]);
     const userId = firebase.auth().currentUser.uid;
+    const [selected, setSelected] = useState();
+    const [modalVisible, setModalVisible] = useState(false);
+    const [code, setCode] = useState('');
 
     function dateToString(date) {
         const dd = date.getDate();
@@ -35,10 +38,10 @@ export default function LoanScreen() {
               <Text style={{fontWeight: 'bold'}}>{library}</Text>
               <Text note numberOfLines={1} style={{color: '#F05832'}}>{"Due on " + dateToString(dueDate)}</Text>
               <Form style={{flex: 1, flexDirection: 'row'}}>
-                  <Button style={styles.button} onPress={() => userReturnBook(temp)}>
+                  <Button style={styles.button} onPress={() => returnDialog(temp)}>
                       <Text style={styles.text}>Return</Text>
                   </Button>
-                  <Button warning style={styles.button} onPress={() => alert("why always not implemented yet???")}>
+                  <Button warning style={styles.button} onPress={() => extendPrompt(temp)}>
                       <Text style={[styles.text, {color: 'black'}]}>Extend</Text>
                   </Button>
                   </Form>
@@ -48,9 +51,54 @@ export default function LoanScreen() {
         return borrowedBooks; 
     }
 
-    async function userReturnBook(book) {
+    function returnDialog(book) {
+        setSelected(book);
+        setModalVisible(!modalVisible);
+    }
+
+    async function returnBook() {
+        const codeForTesting = '123456'; // actual deployment will be unique codes for each book
+        if (code === codeForTesting) {
+            await firebase.firestore().collection("users").doc(userId).update({
+                borrowedBooks: firebase.firestore.FieldValue.arrayRemove(selected)
+            });
+            setCode('');
+            setSelected();
+            setModalVisible(!modalVisible);
+        } else {
+            Alert.alert("Incorrect code! Please try again.")
+        }
+    }
+
+    function extendPrompt(book) {
+        if (!book.isExtended) {
+            Alert.alert("Are you sure?", "Book will be extended by 14 days.",
+                [   { text: "No" },
+                    {
+                    text: "Yes",
+                    onPress: () => extendDate(book),
+                    style: "cancel"
+                    }
+                    
+            ])
+        } else {
+            Alert.alert("Unable to extend", "The book has already been extended once.");
+        }
+    }
+
+    async function extendDate(book) {
+        const daysExtended = 14;
+        const oldDueDate = book.dueDate.toDate();
+        let newDueDate = new Date();
+        newDueDate.setDate(oldDueDate.getDate() + daysExtended);
+        newDueDate.setHours(oldDueDate.getHours()); 
         await firebase.firestore().collection("users").doc(userId).update({
             borrowedBooks: firebase.firestore.FieldValue.arrayRemove(book)
+        });
+        book.dueDate = newDueDate;
+        book.isExtended = true;
+        await firebase.firestore().collection("users").doc(userId).update({
+            borrowedBooks: firebase.firestore.FieldValue.arrayUnion(book)
         });
     }
 
@@ -67,6 +115,37 @@ export default function LoanScreen() {
     return (
         <Container>
             <Content>
+            <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <Form style={styles.centeredView}>
+          <Form style={styles.modalView}>
+            <Text style={styles.modalText}>Please key in the code received upon returning book.</Text>
+            <Item regular last>
+                <Input
+                  placeholder='Key in code here'
+                  onChangeText={(text) => setCode(text)}
+                  value={code}
+                  keyboardType='number-pad' ></Input>
+                  
+            </Item>
+            <Form style={{flexDirection: 'row', marginTop: 25}}>
+                  <Button danger style={styles.button} onPress={() => {setModalVisible(!modalVisible)}}>
+                      <Text style={styles.text}>Cancel</Text>
+                  </Button>
+                  <Button success style={styles.button} onPress={() => returnBook()}>
+                      <Text style={[styles.text, {color: 'black'}]}>Confirm</Text>
+                  </Button>
+                  </Form>
+          </Form>
+        </Form>
+      </Modal>
+
             <List>
                 {data}
             </List>
@@ -85,5 +164,31 @@ const styles = StyleSheet.create({
     text: {
         flex: 1,
         textAlign: 'center'
-    }
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+      },
+      modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+      },
+      modalText: {
+        marginBottom: 15,
+        textAlign: "center",
+        fontWeight: "bold"
+      },
 })

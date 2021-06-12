@@ -40,7 +40,7 @@ export default function BookDetailsScreen({ route, navigation }) {
             });
             const borrowedDate = firebase.firestore.Timestamp.now().toDate();
             const dueDate = extendDate(borrowedDate, 14);
-
+            recordUser(library, borrowedDate, dueDate);
             Alert.alert("Successful!",
                 "The book will be available for collection at "
                 + library
@@ -49,7 +49,6 @@ export default function BookDetailsScreen({ route, navigation }) {
                 [{
                   text: "OK",
                   onPress: () => {
-                    recordUser(library, borrowedDate, dueDate);
                     setModalVisible(!modalVisible);},
                   style: "cancel"
                 }]);
@@ -62,11 +61,13 @@ export default function BookDetailsScreen({ route, navigation }) {
     }
 
     async function recordUser(library, borrowedDate, dueDate) {
+      const isExtended = false;
         const book = {
             id,
             borrowedDate,
             dueDate,
-            library
+            library,
+            isExtended
         }
         await db.collection("users").doc(userId).update({
             borrowedBooks: firebase.firestore.FieldValue.arrayUnion(book)
@@ -75,9 +76,8 @@ export default function BookDetailsScreen({ route, navigation }) {
 
     function extendDate(date, day) {
         let dueDate = new Date();
-        const utcToSgTime = 8;
         dueDate.setDate(date.getDate() + day);
-        dueDate.setHours(date.getHours() + utcToSgTime); 
+        dueDate.setHours(date.getHours()); 
         return dueDate;
     }
 
