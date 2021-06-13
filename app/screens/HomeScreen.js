@@ -1,6 +1,6 @@
 import { Container, Content, Footer, FooterTab, Button, Text, Icon, Label, Header, Body, Left, Right, Form } from 'native-base';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
 import { firebase } from '../../firebase'
 
@@ -10,7 +10,7 @@ function HomeScreen() {
     const bookingStyle = styles.others;
     const borrowStyle = styles.others;
     const remindersStyle = styles.others;
-    const [name, setName] = useState('hi')
+    const [name, setName] = useState('')
     const uid = firebase.auth().currentUser.uid;
     const db = firebase.firestore();  
     const docRef = db.collection("users").doc(uid);
@@ -30,21 +30,20 @@ function HomeScreen() {
         <Container>
           <Header androidStatusBarColor='#62B1F6' style={{backgroundColor: '#62B1F6'}}>
           <Left>
-            <Button transparent onPress={() => navigation.openDrawer()}>
-              <Icon name='menu' />
-            </Button>
+            <TouchableOpacity onPress={() => navigation.openDrawer()}>
+              <Icon name='menu' style={{color: 'white'}}/>
+            </TouchableOpacity>
           </Left>
           <Body/>
           <Right/>
             </Header>
           <Content>
             <Label style={{fontSize: 30, color: '#000033', margin: 10}}>{'Hello ' + name}</Label>
-            <Form style={{height: 130, width: '30%', margin: 25}}>
-            <Button onPress={() => navigation.navigate("HealthDeclaration")} style={{flex: 2, borderRadius: 20}}>
-              <Icon style={{fontSize: 70, flex: 1, textAlign: 'center'}} type='FontAwesome5' name="thermometer-half"></Icon>
-            </Button>
-            <Label style={{flex: 1, fontSize: 15, textAlign: 'center', fontWeight: 'bold', marginTop: 5}}>{'Health\nDeclaration'}</Label>
-            </Form>
+            <TouchableOpacity onPress={() => navigation.navigate("HealthDeclaration")}
+              style={{height: 130, width: '30%', margin: 25, borderColor: 'blue', borderWidth: 3, borderRadius: 20, backgroundColor: '#62B1F6'}}>
+                <Image style={{resizeMode: 'cover', width: '100%', height: '66%'}} source={require("../assets/temperature.png")}></Image>
+                <Label style={{flex: 1, fontSize: 15, textAlign: 'center', fontWeight: 'bold'}}>{'Health\nDeclaration'}</Label>
+            </TouchableOpacity>
           </Content>
           <Footer style={{backgroundColor: '#62B1F6'}}>
             <FooterTab>

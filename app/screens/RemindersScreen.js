@@ -1,6 +1,6 @@
 import { Container, Content, Footer, FooterTab, Button, Text, Icon, Header, Body, Left, Right, Label } from 'native-base';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
 
 function RemindersScreen() {
@@ -14,9 +14,9 @@ function RemindersScreen() {
         <Container >
           <Header androidStatusBarColor='#62B1F6' style={{backgroundColor: '#62B1F6'}}>
           <Left>
-            <Button transparent onPress={() => navigation.openDrawer()}>
-              <Icon name='menu' />
-            </Button>
+            <TouchableOpacity onPress={() => navigation.openDrawer()}>
+              <Icon name='menu' style={{color: 'white'}}/>
+            </TouchableOpacity>
           </Left>
           <Body/>
           <Right/>

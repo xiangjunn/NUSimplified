@@ -1,19 +1,19 @@
-import { Container, Footer, FooterTab, Button, Text, Icon, Header, Body, Left, Right, Label, List, ListItem, Thumbnail, Form } from 'native-base';
+import { Container, Content, Footer, FooterTab, Button, Text, Icon, Header, Body, Left, Right, Label, Form } from 'native-base';
 import React from 'react';
-import { Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
 import { LinearGradient } from 'expo-linear-gradient';
 
-function BorrowScreen() {
+function BookingScreen() {
     const navigation = useNavigation();
     const homeStyle = styles.others;
-    const bookingStyle = styles.others;
-    const borrowStyle = styles.selected;
+    const bookingStyle = styles.selected;
+    const borrowStyle = styles.others;
     const remindersStyle = styles.others;
 
     return (
         <Container >
-          <Header androidStatusBarColor='#62B1F6' style={{backgroundColor: '#62B1F6'}}>
+         <Header androidStatusBarColor='#62B1F6' style={{backgroundColor: '#62B1F6'}}>
           <Left>
             <TouchableOpacity onPress={() => navigation.openDrawer()}>
               <Icon name='menu' style={{color: 'white'}}/>
@@ -24,39 +24,37 @@ function BorrowScreen() {
             </Header>
           <Form style={{flex: 1, justifyContent: 'center'}}>
           <LinearGradient
-        colors={['#ff7e5f', '#feb47b']}
+        colors={['#d9a7c7', '#fffcdc']}
         start={[0, 1]}
         end={[1, 0]}
         style={styles.view}>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Browse')}>
-          <Label  style={[styles.text, {color: 'black'}]}>Browse</Label>
-          <Icon type='FontAwesome5' name='search' style={[styles.icon, {color: 'black'}]}/>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('SportBooking')}>
+          <Label  style={[styles.text, {color: 'black'}]}>{"Sport\nFacilities"}</Label>
           </TouchableOpacity>
         </LinearGradient>
           <LinearGradient
-        colors={['#42275a', '#734b6d']}
+        colors={['#0cebeb', '#20e3b2', '#29ffc6']}
         start={[0, 1]}
         end={[1, 0]}
         style={styles.view}>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Loan')}>
-          <Label style={[styles.text, {color: 'white'}]}>Book Loans</Label>
-          <Icon type='FontAwesome5' name='book' style={[styles.icon, {color: 'white'}]}/>
+          <TouchableOpacity style={styles.button} onPress={() => {}}>
+          <Label style={[styles.text, {color: 'black'}]}>Other Facilities</Label>
           </TouchableOpacity>
         </LinearGradient>
           </Form>
           <Footer style={{backgroundColor: '#62B1F6'}}>
             <FooterTab>
-              <Button info onPress={() => navigation.navigate("Home")}>
+              <Button info  onPress={() => navigation.navigate("Home")}>
                 <Icon name='home' style={homeStyle} />
                 <Text style={homeStyle} >Home</Text>
               </Button>
 
-              <Button info onPress={() => navigation.navigate("Booking")}>
+              <Button info>
                   <Icon type='FontAwesome5' name='id-card' style={bookingStyle} />
                 <Text style={bookingStyle} >Booking</Text>
               </Button>
 
-              <Button info>
+              <Button info onPress={() => navigation.navigate("Borrow")}>
               <Icon name="book" style={borrowStyle} />
               <Text style={borrowStyle}>Borrow</Text>
               </Button>
@@ -91,11 +89,6 @@ const styles = StyleSheet.create({
       fontSize: 40,
       fontWeight: 'bold'
     },
-    icon: {
-      alignSelf: 'center',
-      fontSize: 100,
-      marginTop: 20
-    },
     button: {
       flex: 1,
       width: '100%',
@@ -106,4 +99,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default BorrowScreen;
+export default BookingScreen;
