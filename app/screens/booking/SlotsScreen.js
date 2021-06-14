@@ -7,7 +7,7 @@ import peakDay from '../../backend/sportBookingPeak.json'
 import { getDay, titleCase } from '../../backend/functions'
 
 function SlotsScreen({ route, navigation }) {
-    const { sport, location } = route.params;
+    const { sport, location, name } = route.params;
     const currentDate = firebase.firestore.Timestamp.now().toDate();
     const advanceDate = extendDate(currentDate, 14);
     const [date, setDate] = useState();
@@ -57,26 +57,27 @@ function SlotsScreen({ route, navigation }) {
                     });
                 }
                 const courts = selectedSlot.courts;
-                const componenentArray = courts.map(court => createCourtComponent(court));
+                const componenentArray = courts.map(court => createCourtComponent(court, courts));
                 setSlotsInfo(componenentArray);
             })
         }
     }
 
-    function createCourtComponent(court) {
+    function createCourtComponent(court, courts) {
         const id = court.courtNumber;
         return (
         <Card key={id}>
         <Form style={{margin: 20}}>
         <Text style={{fontSize: 25}}>{titleCase(sport) + ' Court ' + id}</Text>
         <Text>Each slot is 1 hour and represents the start time of the slot.</Text>
-        {createButtonsComponent(court.timeslots)}
+        {createButtonsComponent(court, courts)}
         </Form>
         </Card>
         )
     }
 
-    function createButtonsComponent(timeslots) {
+    function createButtonsComponent(court, courts) {
+        const timeslots = court.timeslots;
         let rowNumber = 1;
         let components = [];
         for (let i = 0; i < timeslots.length; i += 4) {
@@ -88,7 +89,24 @@ function SlotsScreen({ route, navigation }) {
                     eachComponent.push(
                         <Button
                             key={currSlot.time}
-                            style={[{width: '23%', marginHorizontal: '1%'}, currSlot.isAvailable ? styles.available : styles.unavailable]}>
+                            style={[{width: '23%', marginHorizontal: '1%'}, currSlot.isAvailable ? styles.available : styles.unavailable]}
+                            onPress={() => {
+                                if (currSlot.isAvailable) {
+                                    const period = currSlot.isPeak ? "Peak period" : "Non-peak period";
+                                    const body = "Court selected: " + court.courtNumber
+                                                    + "\nTimeslot selected: " + currSlot.time + "\n" + period
+                                                    + "\n\nProceed to book?";
+                                    Alert.alert(name, body, [
+                                    { text: "No" },
+                                    {
+                                    text: "Yes",
+                                    onPress: () => bookCourt(currSlot, courts),
+                                    style: "cancel"
+                                    }
+                                    
+                                     ]);
+                                }
+                            }}>
                             <Text style={{textAlign: 'center', flex: 1}}>{currSlot.time}</Text>
                         </Button>);
                 }
@@ -97,6 +115,14 @@ function SlotsScreen({ route, navigation }) {
             rowNumber++;
         }
         return components;
+    }
+
+    async function bookCourt(currSlot, courts) {
+        currSlot.isAvailable = false;
+        const reference = date + '.' + "courts"
+        firebase.firestore().collection(sport).doc(location).update({
+            [reference]: courts
+        })
     }
 
     return (
@@ -129,6 +155,12 @@ function SlotsScreen({ route, navigation }) {
 />
                 <Button block style={{marginVertical: 10}} onPress={() => displaySlots()}><Text>View Slots</Text></Button>
                 <Text style={{textAlign: 'center', fontSize: 30}}>{date}</Text>
+                <Form style={{flexDirection: 'row', margin: 20}}>
+                <Form style={{height: 20, width: 20, backgroundColor: '#5cb85c'}}></Form>
+                <Text style={{marginLeft: 5, marginRight: 20}}>Available</Text>
+                <Form style={{height: 20, width: 20, backgroundColor: 'red'}}></Form>
+                <Text style={{marginLeft: 5}}>Unavailable</Text>
+                </Form>
                 {slotsInfo}
             </Content>
         </Container>

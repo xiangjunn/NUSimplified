@@ -10,7 +10,7 @@ function BadmintonScreen() {
     return (
         <Container >
             <Content>
-                <TouchableOpacity onPress={() => navigation.navigate("Slots", {sport, location: "uTown"})}>
+                <TouchableOpacity onPress={() => navigation.navigate("Slots", {sport, location: "uTown", name: "UTown - Sports Hall 1"})}>
                 <Card>
                 <CardItem cardBody>
                 <Image source={require("../../assets/utown.jpg")} style={{height: 250, width: null, flex: 1}}/>
@@ -22,7 +22,7 @@ function BadmintonScreen() {
                 </TouchableOpacity>  
                 <Form style={{height: 10}}></Form>
                 <Card>
-                <TouchableOpacity onPress={() => navigation.navigate("Slots", {sport, location: "kentRidge"})}>
+                <TouchableOpacity onPress={() => navigation.navigate("Slots", {sport, location: "kentRidge", name: "Kent Ridge - MPSH 5"})}>
                 <CardItem cardBody>
                 <Image source={require("../../assets/kentridge.jpg")} style={{height: 250, width: null, flex: 1}}/>
                 </CardItem>
