@@ -1,15 +1,18 @@
-import { Container, Content, Footer, FooterTab, Button, Text, Form, Card, CardItem } from 'native-base';
+import { Container, Content, Label, Button, Text, Form, Card, CardItem } from 'native-base';
 import React, { useState } from 'react';
-import { StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import {Calendar} from 'react-native-calendars';
 import { firebase } from '../../../firebase';
+import peakDay from '../../backend/sportBookingPeak.json'
+import { getDay, titleCase } from '../../backend/functions'
 
-function SlotsScreen() {
-    const navigation = useNavigation();
+function SlotsScreen({ route, navigation }) {
+    const { sport, location } = route.params;
     const currentDate = firebase.firestore.Timestamp.now().toDate();
     const advanceDate = extendDate(currentDate, 14);
-    const [date, setDate] = useState({});
+    const [date, setDate] = useState();
+    const [dateObject, setDateObject] = useState({});
+    const [slotsInfo, setSlotsInfo] = useState([]);
 
     function dateToString(date) {
         let dd = date.getDate();
@@ -28,6 +31,74 @@ function SlotsScreen() {
         return dueDate;
     }
 
+    async function displaySlots() {
+        console.log(sport, location);
+        if (date === undefined) {
+            Alert.alert("Unable to show booking slots", "Please select a date!");
+        } else {
+            await firebase.firestore().collection(sport).doc(location).onSnapshot(async doc => {
+                let selectedSlot = doc.get(date);
+                const jsDate = new Date(date);
+                const day = getDay(jsDate);
+                if (!selectedSlot) { // slots for the selected date is not available in database, need to add
+                    selectedSlot = {
+                        ...peakDay,
+                        day
+                        }
+                    await firebase.firestore().collection(sport).doc(location).set({
+                        ...doc.data(),
+                        [date] : selectedSlot
+                    })
+                    .then(() => {
+                        console.log("Document successfully written!");
+                    })
+                    .catch((error) => {
+                        console.error("Error writing document: ", error);
+                    });
+                }
+                const courts = selectedSlot.courts;
+                const componenentArray = courts.map(court => createCourtComponent(court));
+                setSlotsInfo(componenentArray);
+            })
+        }
+    }
+
+    function createCourtComponent(court) {
+        const id = court.courtNumber;
+        return (
+        <Card key={id}>
+        <Form style={{margin: 20}}>
+        <Text style={{fontSize: 25}}>{titleCase(sport) + ' Court ' + id}</Text>
+        <Text>Each slot is 1 hour and represents the start time of the slot.</Text>
+        {createButtonsComponent(court.timeslots)}
+        </Form>
+        </Card>
+        )
+    }
+
+    function createButtonsComponent(timeslots) {
+        let rowNumber = 1;
+        let components = [];
+        for (let i = 0; i < timeslots.length; i += 4) {
+            let eachComponent = [];
+            for (let j = 0; j < 4; j++) {
+                const pos = i + j;
+                if (pos < timeslots.length) {
+                    const currSlot = timeslots[pos];
+                    eachComponent.push(
+                        <Button
+                            key={currSlot.time}
+                            style={[{width: '23%', marginHorizontal: '1%'}, currSlot.isAvailable ? styles.available : styles.unavailable]}>
+                            <Text style={{textAlign: 'center', flex: 1}}>{currSlot.time}</Text>
+                        </Button>);
+                }
+            }
+            components.push(<Form key={rowNumber} style={{flexDirection: 'row', marginVertical: 10}}>{eachComponent}</Form>);
+            rowNumber++;
+        }
+        return components;
+    }
+
     return (
         <Container >
             <Content>            
@@ -39,7 +110,9 @@ function SlotsScreen() {
   // Handler which gets executed on day press. Default = undefined
   onDayPress={(day) => {
       const selectedDate = day.dateString;
-      setDate({[selectedDate]: {selected: true, selectedColor: '#62B1F6'}})}}
+      setDate(selectedDate);
+      setSlotsInfo([]);
+      setDateObject({[selectedDate]: {selected: true, selectedColor: '#62B1F6'}})}}
   // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
   monthFormat={'MMMM yyyy'}
   // Do not show days of other months in month page. Default = false
@@ -52,14 +125,23 @@ function SlotsScreen() {
   disableAllTouchEventsForDisabledDays={true}
 //   // Enable the option to swipe between months. Default = false
   enableSwipeMonths={true}
-  markedDates={date}
+  markedDates={dateObject}
 />
+                <Button block style={{marginVertical: 10}} onPress={() => displaySlots()}><Text>View Slots</Text></Button>
+                <Text style={{textAlign: 'center', fontSize: 30}}>{date}</Text>
+                {slotsInfo}
             </Content>
         </Container>
     );
 }
 
 const styles = StyleSheet.create({
+    available: {
+        backgroundColor: '#5cb85c'
+    },
+    unavailable: {
+        backgroundColor: 'red'
+    }
 });
 
 export default SlotsScreen;

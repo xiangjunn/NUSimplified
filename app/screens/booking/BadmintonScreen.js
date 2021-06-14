@@ -5,32 +5,29 @@ import { useNavigation } from '@react-navigation/native';
 
 function BadmintonScreen() {
     const navigation = useNavigation();
+    const sport = "badminton";
 
     return (
         <Container >
             <Content>
+                <TouchableOpacity onPress={() => navigation.navigate("Slots", {sport, location: "uTown"})}>
                 <Card>
-                <TouchableOpacity onPress={() => navigation.navigate("Slots")}>
                 <CardItem cardBody>
                 <Image source={require("../../assets/utown.jpg")} style={{height: 250, width: null, flex: 1}}/>
                 </CardItem>
                 <CardItem>
-                    <Button transparent style={{flex: 1}}>
                     <Text style={{fontWeight: 'bold', fontSize: 15, textAlign: 'center', flex: 1}}>UTown - Sports Hall 1</Text>
-                    </Button>
-                </CardItem>
-                </TouchableOpacity>             
+                </CardItem>              
                 </Card>
+                </TouchableOpacity>  
                 <Form style={{height: 10}}></Form>
                 <Card>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate("Slots", {sport, location: "kentRidge"})}>
                 <CardItem cardBody>
                 <Image source={require("../../assets/kentridge.jpg")} style={{height: 250, width: null, flex: 1}}/>
                 </CardItem>
                 <CardItem>
-                    <Button transparent style={{flex: 1}}>
                     <Text style={{fontWeight: 'bold', fontSize: 15, textAlign: 'center', flex: 1}}>Kent Ridge - MPSH 5</Text>
-                    </Button>
                 </CardItem>
                 </TouchableOpacity>             
             </Card>

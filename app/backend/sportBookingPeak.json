@@ -1,0 +1,38 @@
+{
+ "courts": [
+    {"courtNumber": "20",
+     "timeslots": [
+      {"time": "0900", "isPeak": true, "isAvailable": true},
+      {"time": "1000", "isPeak": true, "isAvailable": true},
+      {"time": "1100", "isPeak": true, "isAvailable": true},
+      {"time": "1200", "isPeak": true, "isAvailable": true},
+      {"time": "1300", "isPeak": true, "isAvailable": true},
+      {"time": "1400", "isPeak": true, "isAvailable": true},
+      {"time": "1500", "isPeak": true, "isAvailable": true},
+      {"time": "1600", "isPeak": true, "isAvailable": true},
+      {"time": "1700", "isPeak": true, "isAvailable": true},
+      {"time": "1800", "isPeak": true, "isAvailable": true}]},
+    {"courtNumber": "21",
+      "timeslots": [
+         {"time": "0900", "isPeak": true, "isAvailable": true},
+         {"time": "1000", "isPeak": true, "isAvailable": true},
+         {"time": "1100", "isPeak": true, "isAvailable": true},
+         {"time": "1200", "isPeak": true, "isAvailable": true},
+         {"time": "1300", "isPeak": true, "isAvailable": true},
+         {"time": "1400", "isPeak": true, "isAvailable": true},
+         {"time": "1500", "isPeak": true, "isAvailable": true},
+         {"time": "1600", "isPeak": true, "isAvailable": true},
+         {"time": "1700", "isPeak": true, "isAvailable": true},
+         {"time": "1800", "isPeak": true, "isAvailable": true}]},
+    {"courtNumber": "22",
+      "timeslots": [
+         {"time": "0900", "isPeak": true, "isAvailable": true},
+         {"time": "1000", "isPeak": true, "isAvailable": true},
+         {"time": "1100", "isPeak": true, "isAvailable": true},
+         {"time": "1200", "isPeak": true, "isAvailable": true},
+         {"time": "1300", "isPeak": true, "isAvailable": true},
+         {"time": "1400", "isPeak": true, "isAvailable": true},
+         {"time": "1500", "isPeak": true, "isAvailable": true},
+         {"time": "1600", "isPeak": true, "isAvailable": true},
+         {"time": "1700", "isPeak": true, "isAvailable": true},
+         {"time": "1800", "isPeak": true, "isAvailable": true}]}]}
