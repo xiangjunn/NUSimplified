@@ -13,6 +13,7 @@ function SlotsScreen({ route, navigation }) {
     const [date, setDate] = useState();
     const [dateObject, setDateObject] = useState({});
     const [slotsInfo, setSlotsInfo] = useState([]);
+    const userId = firebase.auth().currentUser.uid;
 
     function dateToString(date) {
         let dd = date.getDate();
@@ -57,26 +58,31 @@ function SlotsScreen({ route, navigation }) {
                     });
                 }
                 const courts = selectedSlot.courts;
-                const componenentArray = courts.map(court => createCourtComponent(court, courts));
+                let index = -1; // because increment before calling function, so first index will be 0
+                const componenentArray = courts.map(
+                    court => {
+                        index++
+                        return createCourtComponent(court, courts, index)
+                    });
                 setSlotsInfo(componenentArray);
             })
         }
     }
 
-    function createCourtComponent(court, courts) {
+    function createCourtComponent(court, courts, index) {
         const id = court.courtNumber;
         return (
         <Card key={id}>
         <Form style={{margin: 20}}>
         <Text style={{fontSize: 25}}>{titleCase(sport) + ' Court ' + id}</Text>
         <Text>Each slot is 1 hour and represents the start time of the slot.</Text>
-        {createButtonsComponent(court, courts)}
+        {createButtonsComponent(court, courts, index)}
         </Form>
         </Card>
         )
     }
 
-    function createButtonsComponent(court, courts) {
+    function createButtonsComponent(court, courts, index) {
         const timeslots = court.timeslots;
         let rowNumber = 1;
         let components = [];
@@ -92,7 +98,7 @@ function SlotsScreen({ route, navigation }) {
                             style={[{width: '23%', marginHorizontal: '1%'}, currSlot.isAvailable ? styles.available : styles.unavailable]}
                             onPress={() => {
                                 if (currSlot.isAvailable) {
-                                    const period = currSlot.isPeak ? "Peak period" : "Non-peak period";
+                                    const period = currSlot.isPeak ? "Period: Peak" : "Period: Non-peak";
                                     const body = "Court selected: " + court.courtNumber
                                                     + "\nTimeslot selected: " + currSlot.time + "\n" + period
                                                     + "\n\nProceed to book?";
@@ -100,7 +106,7 @@ function SlotsScreen({ route, navigation }) {
                                     { text: "No" },
                                     {
                                     text: "Yes",
-                                    onPress: () => bookCourt(currSlot, courts),
+                                    onPress: () => bookCourt(currSlot, courts, index),
                                     style: "cancel"
                                     }
                                     
@@ -117,13 +123,58 @@ function SlotsScreen({ route, navigation }) {
         return components;
     }
 
-    async function bookCourt(currSlot, courts) {
-        currSlot.isAvailable = false;
-        const reference = date + '.' + "courts"
-        firebase.firestore().collection(sport).doc(location).update({
-            [reference]: courts
-        })
-    }
+    async function bookCourt(currSlot, courts, index) {
+        const sfDocRef = firebase.firestore().collection(sport).doc(location);
+        const userInfo = firebase.firestore().collection("users").doc(userId);
+        firebase.firestore().runTransaction((transaction) => {
+        return transaction.get(sfDocRef).then(async (sfDoc) => {
+            if (!sfDoc.exists) {
+                throw "Document does not exist!";
+            }
+            const court = sfDoc.get(date).courts[index];
+            const timeslots = court.timeslots;
+            let isAvailable = false;
+            for (let i = 0; i < timeslots.length; i++) {
+                if (timeslots[i].time === currSlot.time) {
+                    isAvailable = timeslots[i].isAvailable;
+                    break;
+                }
+            }
+            const userBookings = await firebase.firestore().collection("users").doc(userId).get().then(doc => doc.get("bookings"));
+            let canBook = true;
+            if (userBookings) {
+                for (let i = 0; i < userBookings.length; i++) {
+                    if (userBookings[i].date == date) {
+                        canBook = false;
+                        break;
+                    }
+                }
+            }
+            
+            if (isAvailable && canBook) {
+                const reference = date + '.' + 'courts';
+                currSlot.isAvailable = false;
+                const courtNumber = court.courtNumber;
+                const time = currSlot.time;
+                const slotInfo = {
+                    date,
+                    courtNumber,
+                    time,
+                    activity: sport,
+                    location: name
+                }
+                transaction.update(userInfo, { bookings : firebase.firestore.FieldValue.arrayUnion(slotInfo) }); 
+                transaction.update(sfDocRef, { [reference] : courts });
+            } else if (!isAvailable) {
+                Alert.alert("Unable to book slot", "Sorry! This slot is already taken.");
+            } else if (!canBook) {
+                Alert.alert("You cannot have two bookings on the same day.")
+            }
+        });
+            }).catch((err) => {
+                console.error(err);
+            });
+        }
 
     return (
         <Container >

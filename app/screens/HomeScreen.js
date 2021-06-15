@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
 import { firebase } from '../../firebase'
+import { DATAMALL_API } from '@env'
+import axios from 'axios'
 
 function HomeScreen() {
     const navigation = useNavigation();
@@ -26,6 +28,16 @@ function HomeScreen() {
       return () => console.log('unmounting...');
     }, []) 
 
+    function bus() {
+      console.log('hi')
+      const instance = axios.create({
+        baseURL: 'http://datamall2.mytransport.sg/ltaodataservice/',
+        timeout: 1000,
+      });
+      instance.defaults.headers.common['AccountKey'] = DATAMALL_API;
+      instance.get('/BusArrivalv2?BusStopCode=77009').then(x => console.log(x.data));
+    }
+
     return (
         <Container>
           <Header androidStatusBarColor='#62B1F6' style={{backgroundColor: '#62B1F6'}}>
@@ -44,6 +56,7 @@ function HomeScreen() {
                 <Image style={{resizeMode: 'cover', width: '100%', height: '66%'}} source={require("../assets/temperature.png")}></Image>
                 <Label style={{flex: 1, fontSize: 15, textAlign: 'center', fontWeight: 'bold'}}>{'Health\nDeclaration'}</Label>
             </TouchableOpacity>
+            <Button onPress={() => bus()}><Text>Hi</Text></Button>
           </Content>
           <Footer style={{backgroundColor: '#62B1F6'}}>
             <FooterTab>
