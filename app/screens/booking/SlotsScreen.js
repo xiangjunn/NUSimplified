@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import {Calendar} from 'react-native-calendars';
 import { firebase } from '../../../firebase';
-import peakDay from '../../backend/sportBookingPeak.json'
+import badmintonBooking from '../../backend/badmintonBooking.json'
 import { getDay, titleCase } from '../../backend/functions'
 
 function SlotsScreen({ route, navigation }) {
@@ -41,11 +41,17 @@ function SlotsScreen({ route, navigation }) {
                 let selectedSlot = doc.get(date);
                 const jsDate = new Date(date);
                 const day = getDay(jsDate);
+                let json = {};
                 if (!selectedSlot) { // slots for the selected date is not available in database, need to add
+                    if (day == 'Saturday' || day == 'Sunday') {
+                        json = badmintonBooking[location].peak;
+                    } else {
+                        json = badmintonBooking[location].nonPeak;
+                    }
                     selectedSlot = {
-                        ...peakDay,
+                        ...json,
                         day
-                        }
+                    }
                     await firebase.firestore().collection(sport).doc(location).set({
                         ...doc.data(),
                         [date] : selectedSlot

@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import MainBookingScreen from '../screens/booking/MainBookingScreen';
 import SportBookingScreen from '../screens/booking/SportBookingScreen';
 import BadmintonScreen from '../screens/booking/BadmintonScreen';
+import SquashScreen from '../screens/booking/SquashScreen';
 import SlotsScreen from '../screens/booking/SlotsScreen';
 
 export default function BookingNavigator() {
@@ -41,6 +42,15 @@ export default function BookingNavigator() {
                 title: 'Choose your slots',
             }}
             /> 
+
+            <Stack.Screen
+            name="Squash"
+            component={SquashScreen}
+            options={{
+                title: 'Choose your location',
+            }}
+            /> 
+
         </Stack.Navigator>)
 }
 
