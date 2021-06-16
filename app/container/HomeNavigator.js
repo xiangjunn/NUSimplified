@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import HomeScreen from '../screens/HomeScreen';
 import HealthDeclaration from '../container/HealthDeclaration'
+import BusArrival from '../screens/BusArrivalScreen'
 
 export default function HomeNavigator() {
     const Stack = createStackNavigator();
@@ -22,6 +23,14 @@ export default function HomeNavigator() {
             component={HealthDeclaration}
             options={{
                 title: 'Declare your temperature!',
+            }}
+            />
+        
+        <Stack.Screen
+            name="BusArrival"
+            component={BusArrival}
+            options={{
+                title: '',
             }}
             />
 

@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
 import { firebase } from '../../firebase'
-import { DATAMALL_API } from '@env'
-import axios from 'axios'
+import BusArrivalScreen from './BusArrivalScreen';
+
 
 function HomeScreen() {
     const navigation = useNavigation();
@@ -17,8 +17,6 @@ function HomeScreen() {
     const db = firebase.firestore();  
     const docRef = db.collection("users").doc(uid);
 
-
-
     useEffect(() => {
       docRef.get().then(doc => {
         const data = doc.data();
@@ -28,15 +26,7 @@ function HomeScreen() {
       return () => console.log('unmounting...');
     }, []) 
 
-    function bus() {
-      console.log('hi')
-      const instance = axios.create({
-        baseURL: 'http://datamall2.mytransport.sg/ltaodataservice/',
-        timeout: 1000,
-      });
-      instance.defaults.headers.common['AccountKey'] = DATAMALL_API;
-      instance.get('/BusArrivalv2?BusStopCode=77009').then(x => console.log(x.data));
-    }
+  
 
     return (
         <Container>
@@ -51,12 +41,21 @@ function HomeScreen() {
             </Header>
           <Content>
             <Label style={{fontSize: 30, color: '#000033', margin: 10}}>{'Hello ' + name}</Label>
+            <Form style={{height: 130, width: '100%', marginTop: 25, flexDirection: 'row', justifyContent: 'space-evenly'}}>
             <TouchableOpacity onPress={() => navigation.navigate("HealthDeclaration")}
-              style={{height: 130, width: '30%', margin: 25, borderColor: 'blue', borderWidth: 3, borderRadius: 20, backgroundColor: '#62B1F6'}}>
+              style={{height: '100%', width: '30%',
+              borderColor: 'blue', borderWidth: 5, borderRadius: 20, backgroundColor: 'white'}}>
                 <Image style={{resizeMode: 'cover', width: '100%', height: '66%'}} source={require("../assets/temperature.png")}></Image>
                 <Label style={{flex: 1, fontSize: 15, textAlign: 'center', fontWeight: 'bold'}}>{'Health\nDeclaration'}</Label>
             </TouchableOpacity>
-            <Button onPress={() => bus()}><Text>Hi</Text></Button>
+            <TouchableOpacity onPress={() => navigation.navigate("BusArrival")}
+              style={{height: '100%', width: '30%', borderColor: 'blue', borderWidth: 5, borderRadius: 20, backgroundColor: 'white'}}>
+                <Image style={{resizeMode: 'cover', width: '60%', height: '61%', marginTop: '5%', borderRadius: 18, alignSelf: 'center'}} source={require("../assets/bus.png")}></Image>
+                <Label style={{flex: 1, fontSize: 15, textAlign: 'center', fontWeight: 'bold'}}>{'Bus\nArrival'}</Label>
+            </TouchableOpacity>
+            </Form>
+            
+            <Button onPress={() => {}}><Text>byee</Text></Button>
           </Content>
           <Footer style={{backgroundColor: '#62B1F6'}}>
             <FooterTab>
