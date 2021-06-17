@@ -44,12 +44,13 @@ function HomeScreen() {
             <Form style={{height: 130, width: '100%', marginTop: 25, flexDirection: 'row', justifyContent: 'space-evenly'}}>
             <TouchableOpacity onPress={() => navigation.navigate("HealthDeclaration")}
               style={{height: '100%', width: '30%',
-              borderColor: 'blue', borderWidth: 5, borderRadius: 20, backgroundColor: 'white'}}>
+              borderColor: 'rgba(255, 0, 0, 0.6)', borderWidth: 5, borderRadius: 20, backgroundColor: 'rgba(255, 0, 0, 0.1)'}}>
                 <Image style={{resizeMode: 'cover', width: '100%', height: '66%'}} source={require("../assets/temperature.png")}></Image>
                 <Label style={{flex: 1, fontSize: 15, textAlign: 'center', fontWeight: 'bold'}}>{'Health\nDeclaration'}</Label>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate("BusArrival")}
-              style={{height: '100%', width: '30%', borderColor: 'blue', borderWidth: 5, borderRadius: 20, backgroundColor: 'white'}}>
+              style={{height: '100%', width: '30%', borderColor: 'rgba(255, 0, 255, 0.7)',
+              borderWidth: 5, borderRadius: 20, backgroundColor: 'rgba(255, 0, 255, 0.1)'}}>
                 <Image style={{resizeMode: 'cover', width: '60%', height: '61%', marginTop: '5%', borderRadius: 18, alignSelf: 'center'}} source={require("../assets/bus.png")}></Image>
                 <Label style={{flex: 1, fontSize: 15, textAlign: 'center', fontWeight: 'bold'}}>{'Bus\nArrival'}</Label>
             </TouchableOpacity>

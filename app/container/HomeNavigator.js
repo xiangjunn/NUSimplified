@@ -30,7 +30,7 @@ export default function HomeNavigator() {
             name="BusArrival"
             component={BusArrival}
             options={{
-                title: '',
+                title: 'Bus Arrival',
             }}
             />
 
