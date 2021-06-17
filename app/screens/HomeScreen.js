@@ -26,8 +26,6 @@ function HomeScreen() {
       return () => console.log('unmounting...');
     }, []) 
 
-  
-
     return (
         <Container>
           <Header androidStatusBarColor='#62B1F6' style={{backgroundColor: '#62B1F6'}}>
@@ -55,8 +53,6 @@ function HomeScreen() {
                 <Label style={{flex: 1, fontSize: 15, textAlign: 'center', fontWeight: 'bold'}}>{'Bus\nArrival'}</Label>
             </TouchableOpacity>
             </Form>
-            
-            <Button onPress={() => {}}><Text>byee</Text></Button>
           </Content>
           <Footer style={{backgroundColor: '#62B1F6'}}>
             <FooterTab>

@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { firebase } from '../../firebase';
 import { DATAMALL_API } from '@env'
 import axios from 'axios'
+import BusTimings from './BusTimings'
 
 function BusArrivalScreen() {
     const navigation = useNavigation();
@@ -12,14 +13,22 @@ function BusArrivalScreen() {
     const [busStops, setBusStops] = useState([]);
     const [expand, setExpand] = useState({"selected": null});
     const [arrayholder, setArrayholder] = useState([]);
+    const [doneQuery, setDoneQuery] = useState(false);
 
-    function busInfoComponent(bus) {
-      return (
-        <Form key={bus} style={{height: 40, marginHorizontal: 30, marginVertical: 10, borderColor: 'grey', borderBottomWidth: 1}}>
-          <Text style={{fontWeight: 'bold', textAlignVertical: 'center', flex: 1}}>{bus}</Text>
-        </Form>
-      )
-    }
+    // function busInfoComponent(bus, busStop) {
+    //   const busInfo = queryBus(bus, busStop);
+    //   return (
+    //     <Form key={bus} style={{height: 40, marginHorizontal: 30,
+    //     marginVertical: 10, borderColor: 'grey', borderBottomWidth: 1, flexDirection: 'row'}}>
+    //       <Text style={{fontWeight: 'bold', textAlignVertical: 'center', flex: 1}}>{bus}</Text>
+    //       {doneQuery ? <Text style={{textAlignVertical: 'center', flex: 1}}>{busInfo.ServiceNo}</Text>
+    //       : <Text style={{textAlignVertical: 'center', flex: 1}}>hi</Text>}
+          
+    //       <Text style={{textAlignVertical: 'center', flex: 1}}>{bus}</Text>
+    //       <Text style={{textAlignVertical: 'center', flex: 1}}>{bus}</Text>
+    //     </Form>
+    //   )
+    // }
 
     function searchFilterFunction(text) {   
       const newData = arrayholder.filter(item => {      
@@ -31,28 +40,20 @@ function BusArrivalScreen() {
       setBusStops(newData); 
     };
 
-    // function bus() {
-    //   var arr = []
-    //   console.log("yep pass")
+    // async function queryBus(bus, busStop) {
+    //   const data = await firebase.firestore().collection("buses").doc(bus).get().then(doc => doc.data());
+    //   const mockBusService = data.mockBusService;
+    //   const busStopCode = data.stops[busStop].busStopCode;
     //   const instance = axios.create({
     //     baseURL: 'http://datamall2.mytransport.sg/ltaodataservice/',
     //     timeout: 1000,
     //   });
     //   instance.defaults.headers.common['AccountKey'] = DATAMALL_API;
-    //   async function getQuery() {
-    //     for (let i = 0; i < busService.length; i++) {
-    //       console.log("hi")
-    //       const query = busService[i].busStopCode;
-          
-    //       await instance.get('/BusArrivalv2?BusStopCode=' + query + "&ServiceNo=154").then(x => {
-    //         console.log(x.data.BusStopCode)
-    //         arr.push(<Text key={i}>Hi</Text>);
-    //         console.log("bye")
-    //       });
-    //     }
-    //     setData(arr);
-    //   }
-    //   getQuery();
+    //   const query = await instance.get('/BusArrivalv2?BusStopCode=' + busStopCode + "&ServiceNo=" + mockBusService)
+    //     .then(res => res.data.Services[0]);
+    //   console.log(query.ServiceNo)
+    //   setDoneQuery(true)
+    //   return query;
     // }
 
   
@@ -97,7 +98,10 @@ function BusArrivalScreen() {
       extraData={expand}
       renderItem={({ item }) => ( // item represents a busstop
         expand.selected !== item.key ?
-        <TouchableOpacity style={styles.container} onPress={() => setExpand({"selected": item.key})}>
+        <TouchableOpacity style={styles.container} onPress={() => {
+          setDoneQuery(false);
+          setExpand({"selected": item.key});
+        }}>
           <Form style={{flex: 1, marginVertical: 5, marginHorizontal: 10}}>
           <Text style={{fontWeight: 'bold'}}>{item.name}</Text>
           <Text>{item.key}</Text>
@@ -111,20 +115,20 @@ function BusArrivalScreen() {
           <Text>{item.key}</Text>
           </Form>
         </Form>
-        <Form style={{flexDirection: 'row', height: 30}}>
+        <Form style={{flexDirection: 'row', height: 30, marginHorizontal: 30}}>
           <Form style={{flex: 1}}></Form>
           <Form style={{flex: 1}}>
-            <Text>First</Text>
+            <Text style={{fontWeight: 'bold', backgroundColor: 'red'}}>First</Text>
           </Form>
           <Form style={{flex: 1}}>
-          <Text>Second</Text>
+          <Text style={{fontWeight: 'bold', backgroundColor: 'red'}}>Second</Text>
           </Form>
           <Form style={{flex: 1}}>
-          <Text>Third</Text>
+          <Text style={{fontWeight: 'bold', backgroundColor: 'red'}}>Third</Text>
           </Form>
 
         </Form>
-        {item.buses.map(bus => busInfoComponent(bus))}
+        {item.buses.map(bus => <BusTimings key={bus} busStop={item.key} bus={bus}></BusTimings>)}
         </Form>
         
         
