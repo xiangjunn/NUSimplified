@@ -59,12 +59,26 @@ export default function LoanScreen() {
     async function returnBook() {
         const codeForTesting = '123456'; // actual deployment will be unique codes for each book
         if (code === codeForTesting) {
-            await firebase.firestore().collection("users").doc(userId).update({
-                borrowedBooks: firebase.firestore.FieldValue.arrayRemove(selected)
+            const db = firebase.firestore();
+            const batch = db.batch();
+            const userRef = db.collection("users").doc(userId);
+            const bookRef = db.collection("library").doc(selected.id);
+            
+            batch.update(userRef,
+                {
+                borrowedBooks: firebase.firestore.FieldValue.arrayRemove(selected)        
             });
-            setCode('');
-            setSelected();
-            setModalVisible(!modalVisible);
+            batch.update(bookRef, {
+                quota: firebase.firestore.FieldValue.increment(1)
+            });
+            batch.commit().then(() => {
+                Alert.alert("Success!", "The book is returned.")
+                setCode('');
+                setSelected();
+                setModalVisible(!modalVisible);
+
+            });
+            
         } else {
             Alert.alert("Incorrect code! Please try again.")
         }
