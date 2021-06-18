@@ -11,6 +11,7 @@ export default function BookDetailsScreen({ route, navigation }) {
     const [quota, setQuota] = useState();
     const [modalVisible, setModalVisible] = useState(false);
     const [borrowed, setBorrowed] = useState(false);
+    const [showDescription, setShowDescription] = useState(false);
 
     function borrow(library) {
         if (quota > 0) {
@@ -114,8 +115,41 @@ export default function BookDetailsScreen({ route, navigation }) {
         return () => { isMounted = false }
     });
     return (
-        <Form style={{flex: 1}}>
-            <Image style={{resizeMode: 'contain', flex: 1}} source={{ uri: book.thumbnailUrl }} />
+        <Container>
+          <Content>
+          <Image style={{resizeMode: 'contain', height: 300, width: '60%',
+            marginTop: 50, borderWidth: 3, borderColor: 'rgba(0,0,0,0.2)', alignSelf: 'center'}} source={{ uri: book.thumbnailUrl }} />
+            <Form style={{flex: 1, margin: 20, backgroundColor: 'white'}}>
+            <Text style={{flex: 1, fontWeight: 'bold', textAlign: 'center', color: '#0645AD', fontSize: 25}}>{book.title}</Text>
+            <Text style={{flex: 1, fontWeight: 'bold', color: '#0645AD', fontSize: 20, marginTop: 20}}>{'Authors & Contributors'}</Text>
+            <Text style={{flex: 1}}>{book.authors.join('\n')}</Text>
+            <Form style={{marginTop: 20, flexDirection: 'row'}}>
+              <Text style={{flex: 1, fontWeight: 'bold', color: '#0645AD', fontSize: 20}}>Book description</Text>
+              <TouchableOpacity style={{marginRight: 10}} onPress={() => setShowDescription(!showDescription)}>
+                <Text style={{flex: 1, textAlignVertical: 'center', color: '#808080'}}>{showDescription ? 'hide' : 'show'}</Text>
+              </TouchableOpacity>
+            </Form>
+            <Text style={{flex: 1}}>{showDescription ? book.longDescription : ''}</Text>
+            <Text style={{flex: 1, fontWeight: 'bold', color: '#0645AD', fontSize: 20}}>Additional Details</Text>
+            <Form style={{flexDirection: 'row', margin: 3}}>
+            <Text style={{flex: 1}}>Published:</Text>
+            <Text style={{flex: 1}}>{book.publishedDate.$date.split('T')[0]}</Text>
+            </Form>
+            <Form style={{flexDirection: 'row', margin: 3}}>
+            <Text style={{flex: 1}}>Total pages:</Text>
+            <Text style={{flex: 1}}>{book.pageCount}</Text>
+            </Form>
+            <Form style={{flexDirection: 'row', margin: 3}}>
+            <Text style={{flex: 1}}>Categories:</Text>
+            <Text style={{flex: 1}}>{book.categories.join(', ')}</Text>
+            </Form>
+            <Form style={{flexDirection: 'row', margin: 3}}>
+            <Text style={{flex: 1}}>ISBN:</Text>
+            <Text style={{flex: 1}}>{book.isbn}</Text>
+            </Form>
+            </Form>
+          </Content>
+            
             <Modal
         animationType="slide"
         transparent={true}
@@ -128,7 +162,7 @@ export default function BookDetailsScreen({ route, navigation }) {
           <Form style={styles.modalView}>
             <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={styles.hideModal} 
             style={{height: '10%', flex: 1, backgroundColor: 'rgba(255,0,0,0.1)',
-                    borderTopLeftRadius: 20, borderBottomWidth: 3, borderBottomColor: 'red', borderTopRightRadius: 20}}>
+                    borderTopLeftRadius: 20, borderWidth: 2, borderColor: 'red', borderTopRightRadius: 20}}>
               <Text style={{fontWeight: 'bold', flex: 1, textAlign: 'center', textAlignVertical: 'center', color: 'red'}}>CLOSE</Text>
             </TouchableOpacity>
 
@@ -157,7 +191,7 @@ export default function BookDetailsScreen({ route, navigation }) {
                         <Text style={{textAlign: 'center', flex: 1, color: 'black'}}>BORROW</Text>
                       </Button>}
             </Footer>
-        </Form>
+        </Container>
     )
 }
 
