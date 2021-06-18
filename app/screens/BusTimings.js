@@ -1,6 +1,6 @@
 import { Container, Content, Footer, FooterTab, Button, Text, Icon, Form, Header, Item, Input } from 'native-base';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Image, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
+import { StyleSheet, Image, TouchableOpacity, ActivityIndicator, FlatList, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firebase } from '../../firebase';
 import { DATAMALL_API } from '@env'
@@ -50,10 +50,14 @@ function BusTimingsScreen(props) {
     }
 
     function convertToSGTime(date) {
+      if (Platform.OS === 'ios') {
+        return date;
+      } else {
         let sgDate = new Date();
         const utcToSgTime = 8;
         sgDate.setHours(date.getHours() + utcToSgTime); 
         return sgDate;
+      }
     }
 
     function differenceInMins(date1, date2) {

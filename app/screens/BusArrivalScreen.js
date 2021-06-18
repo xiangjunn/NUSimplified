@@ -76,6 +76,7 @@ function BusArrivalScreen() {
             />
           </Item>
         </Header>
+        <Form>
           <FlatList
       data={busStops}
       extraData={expand}
@@ -98,9 +99,7 @@ function BusArrivalScreen() {
           </Form>
           <TouchableOpacity
             style={{flex: 1, justifyContent: 'center', alignItems: 'flex-end', marginRight: 20}}
-            onPress={() => {
-              setRefresh(!refresh)
-            console.log(refresh)}}>
+            onPress={() => setRefresh(!refresh)}>
             <Icon type="FontAwesome5" name="redo"></Icon>
           </TouchableOpacity>
         </Form>
@@ -124,6 +123,7 @@ function BusArrivalScreen() {
         
       )}
     />
+    </Form>
     </Container>
     );
 }

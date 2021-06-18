@@ -57,7 +57,7 @@ function SlotsScreen({ route, navigation }) {
                         [date] : selectedSlot
                     })
                     .then(() => {
-                        console.log("Document successfully written!");
+                        console.log("Success in booking!");
                     })
                     .catch((error) => {
                         console.error("Error writing document: ", error);
