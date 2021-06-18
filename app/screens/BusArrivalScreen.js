@@ -13,7 +13,7 @@ function BusArrivalScreen() {
     const [busStops, setBusStops] = useState([]);
     const [expand, setExpand] = useState({"selected": null});
     const [arrayholder, setArrayholder] = useState([]);
-    const [doneQuery, setDoneQuery] = useState(false);
+    const [refresh, setRefresh] = useState(false);
 
     // function busInfoComponent(bus, busStop) {
     //   const busInfo = queryBus(bus, busStop);
@@ -39,23 +39,6 @@ function BusArrivalScreen() {
         });   
       setBusStops(newData); 
     };
-
-    // async function queryBus(bus, busStop) {
-    //   const data = await firebase.firestore().collection("buses").doc(bus).get().then(doc => doc.data());
-    //   const mockBusService = data.mockBusService;
-    //   const busStopCode = data.stops[busStop].busStopCode;
-    //   const instance = axios.create({
-    //     baseURL: 'http://datamall2.mytransport.sg/ltaodataservice/',
-    //     timeout: 1000,
-    //   });
-    //   instance.defaults.headers.common['AccountKey'] = DATAMALL_API;
-    //   const query = await instance.get('/BusArrivalv2?BusStopCode=' + busStopCode + "&ServiceNo=" + mockBusService)
-    //     .then(res => res.data.Services[0]);
-    //   console.log(query.ServiceNo)
-    //   setDoneQuery(true)
-    //   return query;
-    // }
-
   
     useEffect(() => {
       const subscriber = firebase.firestore()
@@ -99,7 +82,6 @@ function BusArrivalScreen() {
       renderItem={({ item }) => ( // item represents a busstop
         expand.selected !== item.key ?
         <TouchableOpacity style={styles.container} onPress={() => {
-          setDoneQuery(false);
           setExpand({"selected": item.key});
         }}>
           <Form style={{flex: 1, marginVertical: 5, marginHorizontal: 10}}>
@@ -114,21 +96,28 @@ function BusArrivalScreen() {
           <Text style={{fontWeight: 'bold'}}>{item.name}</Text>
           <Text>{item.key}</Text>
           </Form>
+          <TouchableOpacity
+            style={{flex: 1, justifyContent: 'center', alignItems: 'flex-end', marginRight: 20}}
+            onPress={() => {
+              setRefresh(!refresh)
+            console.log(refresh)}}>
+            <Icon type="FontAwesome5" name="redo"></Icon>
+          </TouchableOpacity>
         </Form>
         <Form style={{flexDirection: 'row', height: 30, marginHorizontal: 30}}>
           <Form style={{flex: 1}}></Form>
           <Form style={{flex: 1}}>
-            <Text style={{fontWeight: 'bold', backgroundColor: 'red'}}>First</Text>
+            <Text style={{fontWeight: 'bold'}}>First</Text>
           </Form>
           <Form style={{flex: 1}}>
-          <Text style={{fontWeight: 'bold', backgroundColor: 'red'}}>Second</Text>
+          <Text style={{fontWeight: 'bold'}}>Second</Text>
           </Form>
           <Form style={{flex: 1}}>
-          <Text style={{fontWeight: 'bold', backgroundColor: 'red'}}>Third</Text>
+          <Text style={{fontWeight: 'bold'}}>Third</Text>
           </Form>
 
         </Form>
-        {item.buses.map(bus => <BusTimings key={bus} busStop={item.key} bus={bus}></BusTimings>)}
+        {item.buses.map(bus => <BusTimings key={refresh + bus} busStop={item.key} bus={bus}></BusTimings>)}
         </Form>
         
         
