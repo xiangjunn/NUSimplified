@@ -1,6 +1,6 @@
 import { Container, Content, Footer, FooterTab, Button, Text, Icon, Radio, Body, Left, Right, Label, List, ListItem, Thumbnail, Form } from 'native-base';
 import React, { useState, useEffect} from 'react';
-import { Image, StyleSheet, Modal, View, Alert } from 'react-native';
+import { Image, StyleSheet, Modal, View, Alert, TouchableOpacity } from 'react-native';
 import { firebase } from '../../../firebase';
 
 export default function BookDetailsScreen({ route, navigation }) {
@@ -126,7 +126,11 @@ export default function BookDetailsScreen({ route, navigation }) {
       >
         <Form style={styles.centeredView}>
           <Form style={styles.modalView}>
-          <Icon type='FontAwesome5' name='times' onPress={() => setModalVisible(!modalVisible)} style={styles.hideModal} />
+            <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={styles.hideModal} 
+            style={{height: '10%', flex: 1, backgroundColor: 'rgba(255,0,0,0.1)',
+                    borderTopLeftRadius: 20, borderBottomWidth: 3, borderBottomColor: 'red', borderTopRightRadius: 20}}>
+              <Text style={{fontWeight: 'bold', flex: 1, textAlign: 'center', textAlignVertical: 'center', color: 'red'}}>CLOSE</Text>
+            </TouchableOpacity>
 
             <Text style={styles.modalText}>Select the location you wish to collect your book.</Text>
             
