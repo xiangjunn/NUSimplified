@@ -25,7 +25,7 @@ export default function ViewBookingsScreen() {
           <FlatList
       data={data}
       renderItem={({ item }) => ( // item represents a booking
-        <Form style={{margin: 20, borderBottomWidth: 2, borderBottomColor: 'grey'}}>
+        <Form key={item.date} style={{margin: 20, borderBottomWidth: 2, borderBottomColor: 'grey'}}>
         <Text style={{flex: 1, fontWeight: 'bold', color: '#0645AD', fontSize: 25, marginBottom: 5}}>{item.location}</Text>
         <Text style={{flex: 1, fontWeight: 'bold', fontSize: 20, marginBottom: 5}}>{sportName[item.activity]}</Text>
         <Text style={styles.text}>Date: {item.date}</Text>

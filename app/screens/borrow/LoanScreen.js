@@ -122,7 +122,11 @@ export default function LoanScreen() {
             if (borrowedBooks && borrowedBooks.length !== 0) {
                 createComponents(borrowedBooks).then((components) => setData(components))
             } else {
-                setData(<Text>You have no book on loan.</Text>)
+                setData(
+                    <Text style={{
+                        color: '#a13d2d', textAlign: 'center', textAlignVertical: 'center', marginTop: 100,
+                        flex: 1, fontWeight: 'bold', fontSize: 20}}>You have no book on loan</Text>
+                )
             } 
             })}, []);
 
