@@ -119,7 +119,7 @@ export default function LoanScreen() {
   useEffect(() => {
       firebase.firestore().collection('users').doc(userId).onSnapshot(query => {
             const borrowedBooks = query.get("borrowedBooks");
-            if (borrowedBooks) {
+            if (borrowedBooks && borrowedBooks.length !== 0) {
                 createComponents(borrowedBooks).then((components) => setData(components))
             } else {
                 setData(<Text>You have no book on loan.</Text>)

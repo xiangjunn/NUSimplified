@@ -6,7 +6,10 @@ import MainBookingScreen from '../screens/booking/MainBookingScreen';
 import SportBookingScreen from '../screens/booking/SportBookingScreen';
 import BadmintonScreen from '../screens/booking/BadmintonScreen';
 import SquashScreen from '../screens/booking/SquashScreen';
+import TennisScreen from '../screens/booking/TennisScreen';
+import TableTennisScreen from '../screens/booking/TableTennisScreen';
 import SlotsScreen from '../screens/booking/SlotsScreen';
+import ViewBookingsScreen from '../screens/booking/ViewBookingsScreen';
 
 export default function BookingNavigator() {
     const Stack = createStackNavigator();
@@ -48,6 +51,27 @@ export default function BookingNavigator() {
             component={SquashScreen}
             options={{
                 title: 'Choose your location',
+            }}
+            /> 
+            <Stack.Screen
+            name="Tennis"
+            component={TennisScreen}
+            options={{
+                title: 'Choose your location',
+            }}
+            /> 
+            <Stack.Screen
+            name="TableTennis"
+            component={TableTennisScreen}
+            options={{
+                title: 'Choose your location',
+            }}
+            /> 
+            <Stack.Screen
+            name="ViewBookings"
+            component={ViewBookingsScreen}
+            options={{
+                title: 'Bookings',
             }}
             /> 
 

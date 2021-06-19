@@ -4,6 +4,9 @@ import { StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import {Calendar} from 'react-native-calendars';
 import { firebase } from '../../../firebase';
 import badmintonBooking from '../../backend/badmintonBooking.json'
+import squashBooking from '../../backend/squashBooking.json'
+import tennisBooking from '../../backend/tennisBooking.json'
+import tableTennisBooking from '../../backend/tableTennisBooking.json'
 import { getDay, titleCase } from '../../backend/functions'
 
 function SlotsScreen({ route, navigation }) {
@@ -33,7 +36,6 @@ function SlotsScreen({ route, navigation }) {
     }
 
     async function displaySlots() {
-        console.log(sport, location);
         if (date === undefined) {
             Alert.alert("Unable to show booking slots", "Please select a date!");
         } else {
@@ -41,12 +43,18 @@ function SlotsScreen({ route, navigation }) {
                 let selectedSlot = doc.get(date);
                 const jsDate = new Date(date);
                 const day = getDay(jsDate);
-                let json = {};
                 if (!selectedSlot) { // slots for the selected date is not available in database, need to add
+                    let json = {};
+                    const sports = {
+                        "badminton" : badmintonBooking,
+                        "squash" : squashBooking,
+                        "tennis" : tennisBooking,
+                        "tableTennis" : tableTennisBooking
+                    }
                     if (day == 'Saturday' || day == 'Sunday') {
-                        json = badmintonBooking[location].peak;
+                        json = sports[sport][location].peak;
                     } else {
-                        json = badmintonBooking[location].nonPeak;
+                        json = sports[sport][location].nonPeak;
                     }
                     selectedSlot = {
                         ...json,
@@ -57,7 +65,7 @@ function SlotsScreen({ route, navigation }) {
                         [date] : selectedSlot
                     })
                     .then(() => {
-                        console.log("Success in booking!");
+                        console.log("Document successfully added!");
                     })
                     .catch((error) => {
                         console.error("Error writing document: ", error);
@@ -171,6 +179,7 @@ function SlotsScreen({ route, navigation }) {
                 }
                 transaction.update(userInfo, { bookings : firebase.firestore.FieldValue.arrayUnion(slotInfo) }); 
                 transaction.update(sfDocRef, { [reference] : courts });
+                Alert.alert("Success", "You have booked court " + courtNumber + " at " + time + " located at " + name)
             } else if (!isAvailable) {
                 Alert.alert("Unable to book slot", "Sorry! This slot is already taken.");
             } else if (!canBook) {

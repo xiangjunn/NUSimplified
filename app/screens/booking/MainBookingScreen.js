@@ -37,8 +37,8 @@ function BookingScreen() {
         start={[0, 1]}
         end={[1, 0]}
         style={styles.view}>
-          <TouchableOpacity style={styles.button} onPress={() => {}}>
-          <Label style={[styles.text, {color: 'black'}]}>Other Facilities</Label>
+          <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate('ViewBookings')}}>
+          <Label style={[styles.text, {color: 'black'}]}>View bookings</Label>
           </TouchableOpacity>
         </LinearGradient>
           </Form>

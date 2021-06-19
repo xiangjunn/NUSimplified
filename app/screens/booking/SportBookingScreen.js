@@ -39,7 +39,7 @@ function SportBookingScreen() {
         start={[0, 1]}
         end={[1, 0]}
         style={styles.view}>
-          <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate("Badminton")}}>
+          <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate("TableTennis")}}>
           <Label  style={[styles.text, {color: 'black'}]}>Table Tennnis</Label>
           <Image style={styles.logo} source={require("../../assets/table-tennis.png")} />
           </TouchableOpacity>
@@ -49,7 +49,7 @@ function SportBookingScreen() {
         start={[0, 1]}
         end={[1, 0]}
         style={styles.view}>
-          <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate("Badminton")}}>
+          <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate("Tennis")}}>
           <Label  style={[styles.text, {color: 'black'}]}>Tennis</Label>
           <Image style={styles.logo} source={require("../../assets/tennis.png")} />
           </TouchableOpacity>
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
         // borderRadius: 40
       },
       logo: {
-        resizeMode: 'stretch',
+        resizeMode: 'contain',
         width: '50%',
         height: '50%',
         alignSelf: 'center'
