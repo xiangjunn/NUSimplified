@@ -39,7 +39,7 @@ function CustomDrawerContent(props) {
 
       </DrawerContentScrollView>
       <View style={{flex: 0.5, justifyContent: 'flex-end'}}>
-          <DrawerItem labelStyle='' inactiveTintColor='red' label="Log out" style={{ justifyContent: 'center'}}
+          <DrawerItem labelStyle='' inactiveTintColor='red' label="Sign out" style={{ justifyContent: 'center'}}
           icon={({color, size}) => (
             <Icon 
             type='FontAwesome5'

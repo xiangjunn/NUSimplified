@@ -2,12 +2,14 @@ import React, { useState } from 'react'
 import { useNavigation } from '@react-navigation/native';
 import { firebase } from '../../firebase'
 import { Content, Form, Item, Input, Icon, Button, Text, Label} from 'native-base';
-import { StyleSheet, Image} from 'react-native';
+import { StyleSheet, Modal, TouchableOpacity, Alert } from 'react-native';
 
 function LoginAuth() {
     const navigation = useNavigation();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [modalVisible, setModalVisible] = useState(false);
+    const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
 
     const onLoginPress = () => {
       firebase
@@ -38,7 +40,19 @@ function LoginAuth() {
           .catch(error => {
               alert(error)
           })
-  }
+    }
+
+    function resetPassword() {
+        firebase.auth().sendPasswordResetEmail(forgotPasswordEmail.toLowerCase().trim())
+        .then(() => {
+          // Password reset email sent!
+          Alert.alert("A password reset email has been sent. Please check your mailbox.");
+          setModalVisible(!modalVisible);
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    }
 
     return (
         <Content style={styles.login}>
@@ -66,9 +80,9 @@ function LoginAuth() {
               </Item>
 
               {/** "Forget password" button */}
-              <Button hasText transparent style={{height: 35, marginTop: 5}} onPress={() => alert('Not implemented yet')}>
+              <TouchableOpacity style={{height: 35, marginTop: 5}} onPress={() => setModalVisible(!modalVisible)}>
                   <Label style={{color: '#0645AD', marginLeft: 10}}>Forgot password?</Label>
-              </Button>
+              </TouchableOpacity>
             
               {/** Login button */}
               <Button rounded success style={styles.margin} onPress={() => onLoginPress()}>
@@ -80,6 +94,40 @@ function LoginAuth() {
                   <Text style={styles.textAlign} >Sign up</Text>
               </Button>
             </Form>
+
+            <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <Form style={styles.centeredView}>
+          <Form style={styles.modalView}>
+            <Text style={styles.modalText}>Please input your email address for password reset</Text>
+            <Item regular last>
+                <Input
+                  placeholder='eg e0123456@u.nus.edu'
+                  onChangeText={(text) => setForgotPasswordEmail(text)}
+                  value={forgotPasswordEmail}
+                  keyboardType='number-pad' ></Input>
+                  
+            </Item>
+            <Form style={{flexDirection: 'row', marginTop: 25}}>
+                  <Button danger style={styles.button} onPress={() => {
+                      setModalVisible(!modalVisible)
+                      setForgotPasswordEmail('')
+                      }}>
+                      <Text style={styles.text}>Cancel</Text>
+                  </Button>
+                  <Button success style={styles.button} onPress={() => resetPassword()}>
+                      <Text style={[styles.text, {color: 'black'}]}>Confirm</Text>
+                  </Button>
+                  </Form>
+          </Form>
+        </Form>
+      </Modal>
         </Content>
       );
   }
@@ -98,7 +146,43 @@ function LoginAuth() {
       textAlign: {
           flex: 1,
           textAlign: 'center'
-      }
+      },
+      centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+      },
+      modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+      },
+      modalText: {
+        marginBottom: 15,
+        textAlign: "center",
+        fontWeight: "bold"
+      },
+      text: {
+        flex: 1,
+        textAlign: 'center'
+    },
+    button: {
+        flex: 1,
+        alignSelf: 'center',
+        marginHorizontal: '5%',
+        borderRadius: 50
+    },
   })
 
   export default LoginAuth;
