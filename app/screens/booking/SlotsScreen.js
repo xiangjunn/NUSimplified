@@ -1,5 +1,5 @@
 import { Container, Content, Label, Button, Text, Form, Card, CardItem } from 'native-base';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import {Calendar} from 'react-native-calendars';
 import { firebase } from '../../../firebase';
@@ -36,10 +36,11 @@ function SlotsScreen({ route, navigation }) {
     }
 
     async function displaySlots() {
+        setSlotsInfo([]);
         if (date === undefined) {
             Alert.alert("Unable to show booking slots", "Please select a date!");
         } else {
-            await firebase.firestore().collection(sport).doc(location).onSnapshot(async doc => {
+            await firebase.firestore().collection(sport).doc(location).get().then(async doc => {
                 let selectedSlot = doc.get(date);
                 const jsDate = new Date(date);
                 const day = getDay(jsDate);
@@ -140,6 +141,8 @@ function SlotsScreen({ route, navigation }) {
     async function bookCourt(currSlot, courts, index) {
         const sfDocRef = firebase.firestore().collection(sport).doc(location);
         const userInfo = firebase.firestore().collection("users").doc(userId);
+        const courtNumber = courts[index].courtNumber;
+        const time = currSlot.time;
         firebase.firestore().runTransaction((transaction) => {
         return transaction.get(sfDocRef).then(async (sfDoc) => {
             if (!sfDoc.exists) {
@@ -168,8 +171,6 @@ function SlotsScreen({ route, navigation }) {
             if (isAvailable && canBook) {
                 const reference = date + '.' + 'courts';
                 currSlot.isAvailable = false;
-                const courtNumber = court.courtNumber;
-                const time = currSlot.time;
                 const slotInfo = {
                     date,
                     courtNumber,
@@ -179,14 +180,23 @@ function SlotsScreen({ route, navigation }) {
                 }
                 transaction.update(userInfo, { bookings : firebase.firestore.FieldValue.arrayUnion(slotInfo) }); 
                 transaction.update(sfDocRef, { [reference] : courts });
-                Alert.alert("Success", "You have booked court " + courtNumber + " at " + time + " located at " + name)
+                return true;
+               
             } else if (!isAvailable) {
-                Alert.alert("Unable to book slot", "Sorry! This slot is already taken.");
+                Alert.alert('Unable to book slot", "Sorry! This slot is already taken. Please press "VIEW SLOTS" again to refresh the slots');
+                return false;
             } else if (!canBook) {
-                Alert.alert("You cannot have two bookings on the same day.")
+                Alert.alert("You cannot have two bookings on the same day.");
+                return false;
             }
         });
-            }).catch((err) => {
+            }).then(success => {
+                if (success) {
+                    Alert.alert("Success", "You have booked court " + courtNumber + " at " + time + " located at " + name);
+                    displaySlots();
+                }
+            })
+            .catch((err) => {
                 console.error(err);
             });
         }

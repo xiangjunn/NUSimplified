@@ -78,6 +78,7 @@ function BusArrivalScreen() {
         </Header>
         <Form>
           <FlatList
+      contentContainerStyle={{ paddingBottom: 300 }}
       data={busStops}
       extraData={expand}
       renderItem={({ item }) => ( // item represents a busstop

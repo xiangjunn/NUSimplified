@@ -21,7 +21,7 @@
     "expo-linear-gradient": "~9.1.0",
     "expo-status-bar": "~1.0.4",
     "express": "^4.17.1",
-    "firebase": "^8.2.3",
+    "firebase": "8.2.3",
     "native-base": "^2.15.2",
     "path": "^0.12.7",
     "querystring": "^0.2.1",

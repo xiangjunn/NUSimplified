@@ -70,6 +70,7 @@ function BrowseBooksScreen() {
       <Form>
         <FlatList
     data={books}
+    contentContainerStyle={{ paddingBottom: 300 }}
     renderItem={({ item }) => ( // item represents a book
     <ListItem
       onPress={() => navigation.navigate('BookDetails', {book: item, id: item.key})}

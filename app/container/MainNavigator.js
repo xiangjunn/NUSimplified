@@ -17,10 +17,6 @@ function CustomDrawerContent(props) {
         <View style={{flex: 1}}>
       <DrawerContentScrollView {...props} >
         <DrawerItemList {...props} />
-        <DrawerItem label="Bus Timings" onPress={() => alert("Not implemented yet")}>
-        </DrawerItem>
-        <DrawerItem label="NUS Wallet" onPress={() => alert("Not implemented yet")}>
-        </DrawerItem>
         <DrawerItem labelStyle='' label="Profile"
           onPress={() => {
             docRef.get().then((doc) => {
