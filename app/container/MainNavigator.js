@@ -6,6 +6,7 @@ import { View, Icon } from 'native-base';
 import { firebase } from '../../firebase'
 import BorrowNavigator from '../container/BorrowNavigator';
 import BookingNavigator from '../container/BookingNavigator';
+import { Alert } from 'react-native';
 
 function CustomDrawerContent(props) {
     const uid = firebase.auth().currentUser.uid;
@@ -22,7 +23,7 @@ function CustomDrawerContent(props) {
             docRef.get().then((doc) => {
             if (doc.exists) {
                 const info = doc.data();
-                alert("Email: " + info.email + "\n"
+                Alert.alert("Profile", "Email: " + info.email + "\n"
                     + "First Name: " + info.firstName + "\n"
                     + "Last Name: " + info.lastName);
             } else {

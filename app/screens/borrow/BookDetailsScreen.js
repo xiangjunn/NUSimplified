@@ -160,10 +160,15 @@ export default function BookDetailsScreen({ route, navigation }) {
       >
         <Form style={styles.centeredView}>
           <Form style={styles.modalView}>
-            <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={styles.hideModal} 
-            style={{height: '10%', flex: 1, backgroundColor: 'rgba(255,0,0,0.1)',
+            <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} 
+            style={{flex: 1, backgroundColor: 'rgba(255,0,0,0.1)',
                     borderTopLeftRadius: 20, borderWidth: 2, borderColor: 'red', borderTopRightRadius: 20}}>
-              <Text style={{fontWeight: 'bold', flex: 1, textAlign: 'center', textAlignVertical: 'center', color: 'red'}}>CLOSE</Text>
+                      <Form style={{flex: 1}}></Form>
+                      <Form style={{flex: 1}}>
+                      <Text style={{fontWeight: 'bold', flex: 1, textAlign: 'center', textAlignVertical: 'center', color: 'red'}}>CLOSE</Text>
+                      </Form>
+                      <Form style={{flex: 1}}></Form>
+              
             </TouchableOpacity>
 
             <Text style={styles.modalText}>Select the location you wish to collect your book.</Text>
@@ -177,7 +182,7 @@ export default function BookDetailsScreen({ route, navigation }) {
                     : <Text style={{color: 'red'}}>Not Available</Text>}
             </Right>
           </ListItem>
-            <Form style={{height: "10%"}}></Form>
+          <Form style={{flex: 10}}></Form>
           </Form>
         </Form>
       </Modal>
@@ -205,7 +210,7 @@ const styles = StyleSheet.create({
     hideModal: {
         alignSelf: 'flex-end',
         marginRight: 10,
-        marginTop: 5
+        marginTop: 5,
     },
     centeredView: {
         flex: 1,
@@ -222,7 +227,8 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.25,
         shadowRadius: 4,
-        elevation: 5
+        elevation: 5,
+        height: '80%'
       },
       buttonOpen: {
         backgroundColor: "#F194FF",

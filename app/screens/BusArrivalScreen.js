@@ -94,7 +94,7 @@ function BusArrivalScreen() {
         :
         <Form style={styles.expanded}>
         <Form style={styles.edittedContainer}>
-          <Form style={{flex: 1, marginVertical: 5, marginHorizontal: 10}}>
+          <Form style={{flex: 2, marginVertical: 5, marginHorizontal: 10}}>
           <Text style={{fontWeight: 'bold'}}>{item.name}</Text>
           <Text>{item.key}</Text>
           </Form>
