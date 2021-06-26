@@ -72,10 +72,16 @@ export default function LoanScreen() {
                 quota: firebase.firestore.FieldValue.increment(1)
             });
             batch.commit().then(() => {
-                Alert.alert("Success!", "The book is returned.")
-                setCode('');
-                setSelected();
                 setModalVisible(!modalVisible);
+                Alert.alert("Success!", "The book is returned.", [{
+                    text: "Ok",
+                    onPress: () => {
+                        setCode('');
+                        setSelected();
+                    },
+                    style: "cancel"
+                    }])
+                
 
             });
             
@@ -103,9 +109,9 @@ export default function LoanScreen() {
     async function extendDate(book) {
         const daysExtended = 14;
         const oldDueDate = book.dueDate.toDate();
-        let newDueDate = new Date();
-        newDueDate.setDate(oldDueDate.getDate() + daysExtended);
-        newDueDate.setHours(oldDueDate.getHours()); 
+        let newDueDate = new Date(oldDueDate);
+        newDueDate.setDate(newDueDate.getDate() + daysExtended);
+        newDueDate.setHours(newDueDate.getHours()); 
         await firebase.firestore().collection("users").doc(userId).update({
             borrowedBooks: firebase.firestore.FieldValue.arrayRemove(book)
         });

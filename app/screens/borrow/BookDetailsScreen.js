@@ -76,9 +76,9 @@ export default function BookDetailsScreen({ route, navigation }) {
     } 
 
     function extendDate(date, day) {
-        let dueDate = new Date();
-        dueDate.setDate(date.getDate() + day);
-        dueDate.setHours(date.getHours()); 
+        let dueDate = new Date(date);
+        dueDate.setDate(dueDate.getDate() + day);
+        dueDate.setHours(dueDate.getHours()); 
         return dueDate;
     }
 
@@ -182,7 +182,7 @@ export default function BookDetailsScreen({ route, navigation }) {
                     : <Text style={{color: 'red'}}>Not Available</Text>}
             </Right>
           </ListItem>
-          <Form style={{flex: 10}}></Form>
+          <Form style={{flex: 8}}></Form>
           </Form>
         </Form>
       </Modal>

@@ -29,9 +29,9 @@ function SlotsScreen({ route, navigation }) {
     }
 
     function extendDate(date, day) {
-        let dueDate = new Date();
-        dueDate.setDate(date.getDate() + day);
-        dueDate.setHours(date.getHours()); 
+        let dueDate = new Date(date);
+        dueDate.setDate(dueDate.getDate() + day);
+        dueDate.setHours(dueDate.getHours()); 
         return dueDate;
     }
 
