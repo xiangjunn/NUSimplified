@@ -1,5 +1,5 @@
 import React from 'react';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem, Toast } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import HomeNavigator from '../container/HomeNavigator';
 import RemindersScreen from '../screens/RemindersScreen';
 import { View, Icon } from 'native-base';
@@ -12,8 +12,6 @@ function CustomDrawerContent(props) {
     const uid = firebase.auth().currentUser.uid;
     const db = firebase.firestore();  
     var docRef = db.collection("users").doc(uid);
-    
-
     return (
         <View style={{flex: 1}}>
       <DrawerContentScrollView {...props} >
@@ -52,9 +50,6 @@ function CustomDrawerContent(props) {
 
 function MainNavigator() {
     const Drawer = createDrawerNavigator();
-    const headerLooks = {headerTitleAlign: 'center', headerStyle: { backgroundColor: '#62B1F6' }};
-    
-
     return (
         <Drawer.Navigator 
           backBehavior="none"

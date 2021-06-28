@@ -1,6 +1,6 @@
-import { Container, Content, Footer, FooterTab, Button, Text, Icon, Radio, Body, Left, Right, Label, List, ListItem, Thumbnail, Form } from 'native-base';
+import { Container, Content, Footer, Button, Text, Left, Right, ListItem, Form } from 'native-base';
 import React, { useState, useEffect} from 'react';
-import { Image, StyleSheet, Modal, View, Alert, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, Modal, Alert, TouchableOpacity } from 'react-native';
 import { firebase } from '../../../firebase';
 
 export default function BookDetailsScreen({ route, navigation }) {

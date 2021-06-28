@@ -19,3 +19,20 @@ export function titleCase(words) {
   }
   return separateWord.join(' ');
 }
+
+export function searchFilter(text, array, ...variables) { // variables are the fields to filter by   
+  const textData = text.toLowerCase();
+  const newData = array.filter(item => {
+    let inNewData = false;
+    for (const element of variables) {
+      const itemText = item[element].toLowerCase();
+      if (itemText.indexOf(textData) > -1) {
+        inNewData = true;
+        break; 
+      }
+    }      
+    return inNewData; 
+  });   
+  return newData;
+};
+

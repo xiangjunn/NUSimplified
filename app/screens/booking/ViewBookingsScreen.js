@@ -1,6 +1,6 @@
-import { Container, Content, Footer, FooterTab, Button, Text, Input, Item, List, ListItem, Thumbnail, Form } from 'native-base';
+import { Text, Form } from 'native-base';
 import React, { useState, useEffect} from 'react';
-import { Image, StyleSheet, Modal, View, Alert, FlatList } from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
 import { firebase } from '../../../firebase';
 
 export default function ViewBookingsScreen() {

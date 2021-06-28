@@ -1,4 +1,4 @@
-import { Container, Content, Footer, FooterTab, Button, Text, Icon, Header, Body, Left, Right, Label, Form } from 'native-base';
+import { Container, Footer, FooterTab, Button, Text, Icon, Header, Body, Left, Right, Label, Form } from 'native-base';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native'

@@ -1,6 +1,6 @@
-import { Container, Content, Label, Button, Text, Form, Card, CardItem } from 'native-base';
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import { Container, Content, Button, Text, Form, Card } from 'native-base';
+import React, { useState } from 'react';
+import { StyleSheet, Alert } from 'react-native';
 import {Calendar} from 'react-native-calendars';
 import { firebase } from '../../../firebase';
 import badmintonBooking from '../../backend/badmintonBooking.json'

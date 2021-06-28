@@ -1,4 +1,4 @@
-import { Container, Content, Footer, FooterTab, Button, Text, Icon, Form, Label } from 'native-base';
+import { Container, Form, Label } from 'native-base';
 import React from 'react';
 import { StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -66,7 +66,6 @@ const styles = StyleSheet.create({
         height: '100%',
         alignSelf: 'center',
         justifyContent: 'center',
-        // borderRadius: 40
       },
       text: {
         textAlign: 'center',
@@ -84,7 +83,6 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignSelf: 'center',
         justifyContent: 'center',
-        // borderRadius: 40
       },
       logo: {
         resizeMode: 'contain',

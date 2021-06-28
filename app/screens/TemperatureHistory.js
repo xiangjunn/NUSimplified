@@ -1,7 +1,8 @@
-import { Container, Content, Button, Text, Icon, Form, List, ListItem } from 'native-base';
+import { Container, Content, Text, Form, List, ListItem } from 'native-base';
 import React, { useState, useEffect} from 'react';
 import { StyleSheet } from 'react-native';
 import { firebase } from '../../firebase';
+import { getDay } from '../backend/functions'
 
 function TemperatureHistory() {
   const [temperatureInfo, setTemperatureInfo] = useState([])
@@ -22,19 +23,6 @@ function TemperatureHistory() {
     hr = hr < 10 ? '0' + hr : hr.toString(); 
     min = min < 10 ? '0' + min : min.toString(); 
     return hr + ':'+ min;
-  }
-
-  function getDay(date) {
-    const map = {
-      0: 'Sunday',
-      1: 'Monday',
-      2: 'Tuesday',
-      3: 'Wednesday',
-      4: 'Thursday',
-      5: 'Friday',
-      6: 'Saturday'
-    }
-    return map[date.getDay()]
   }
 
   async function createComponents(temperatureHistory) {

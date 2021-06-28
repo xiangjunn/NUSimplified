@@ -1,6 +1,6 @@
-import { Container, Content, Footer, FooterTab, Button, Text, Input, Item, List, ListItem, Thumbnail, Form } from 'native-base';
+import { Container, Content, Button, Text, Input, Item, List, ListItem, Form } from 'native-base';
 import React, { useState, useEffect} from 'react';
-import { Image, StyleSheet, Modal, View, Alert } from 'react-native';
+import { Image, StyleSheet, Modal, Alert } from 'react-native';
 import { firebase } from '../../../firebase';
 
 export default function LoanScreen() {

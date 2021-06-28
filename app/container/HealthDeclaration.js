@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Header, Tab, Tabs, TabHeading, Icon, Text, DefaultTabBar } from 'native-base';
+import { Container, Tab, Tabs, TabHeading, Icon, Text, DefaultTabBar } from 'native-base';
 import DeclareTempScreen from '../screens/DeclareTempScreen';
 import TemperatureHistory from '../screens/TemperatureHistory';
 

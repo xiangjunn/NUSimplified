@@ -1,7 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-
 import BorrowScreen from '../screens/borrow/BorrowScreen';
 import BrowseBooksScreen from '../screens/borrow/BrowseBooksScreen';
 import BookDetailsScreen from '../screens/borrow/BookDetailsScreen';

@@ -1,7 +1,6 @@
-import { Container, Content, Footer, FooterTab, Button, Text, Icon, Form, Header, Item, Input } from 'native-base';
+import { Text, Form } from 'native-base';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Image, TouchableOpacity, ActivityIndicator, FlatList, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { firebase } from '../../firebase';
 import { DATAMALL_API } from '@env'
 import axios from 'axios'

@@ -1,8 +1,9 @@
-import { Container, Item, Input, Text, Icon, Header, Body, Left, Right, Label, List, ListItem, Thumbnail, Form } from 'native-base';
+import { Container, Item, Input, Text, Icon, Header, ListItem, Form } from 'native-base';
 import React, { useState, useEffect } from 'react';
 import { Image, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firebase } from '../../../firebase';
+import { searchFilter } from '../../backend/functions';
 
 function BrowseBooksScreen() {
     const navigation = useNavigation();
@@ -21,15 +22,6 @@ function BrowseBooksScreen() {
         return (<Text>{"Authors: " + authors[0] + " & " + (length - 1) + " more"}</Text>)
       }
     }
-
-    function searchFilterFunction(text) {   
-      const newData = arrayholder.filter(item => {      
-        const title = item.title.toUpperCase();
-        const textData = text.toUpperCase();
-        return title.indexOf(textData) > -1;
-        });   
-      setBooks(newData); 
-    };
     
     useEffect(() => {
       const subscriber = firebase.firestore()
@@ -63,7 +55,10 @@ function BrowseBooksScreen() {
           <Icon name="ios-search" />
           <Input
             placeholder="Search"
-            onChangeText={text => searchFilterFunction(text)}  
+            onChangeText={text => {
+              const newData = searchFilter(text, arrayholder, "title")
+              setBooks(newData);
+            }}  
           />
         </Item>
       </Header>

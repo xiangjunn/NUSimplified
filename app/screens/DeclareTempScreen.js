@@ -1,7 +1,6 @@
-import { Container, Content, Button, Text, Item, Form } from 'native-base';
+import { Container, Content, Button, Text, Form } from 'native-base';
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native'
 import Slider from '@react-native-community/slider';
 import { firebase } from '../../firebase'
 

@@ -1,6 +1,6 @@
-import { Container, Footer, FooterTab, Button, Text, Icon, Header, Body, Left, Right, Label, List, ListItem, Thumbnail, Form } from 'native-base';
+import { Container, Footer, FooterTab, Button, Text, Icon, Header, Body, Left, Right, Label, Form } from 'native-base';
 import React from 'react';
-import { Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
 import { LinearGradient } from 'expo-linear-gradient';
 

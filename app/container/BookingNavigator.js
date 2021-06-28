@@ -1,7 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-
 import MainBookingScreen from '../screens/booking/MainBookingScreen';
 import SportBookingScreen from '../screens/booking/SportBookingScreen';
 import BadmintonScreen from '../screens/booking/BadmintonScreen';

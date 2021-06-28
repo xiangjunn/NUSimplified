@@ -29,9 +29,6 @@ function LoginAuth() {
                           alert("Email not verified!")
                           firebase.auth().signOut()
                       }
-                      //const user = firestoreDocument.data()
-                      //console.log(user)
-                      //navigation.replace('Main')
                   })
                   .catch(error => {
                       alert(error)

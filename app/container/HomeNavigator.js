@@ -1,7 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-
 import HomeScreen from '../screens/HomeScreen';
 import HealthDeclaration from '../container/HealthDeclaration'
 import BusArrival from '../screens/BusArrivalScreen'

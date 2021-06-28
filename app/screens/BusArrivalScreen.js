@@ -1,44 +1,16 @@
-import { Container, Content, Footer, FooterTab, Button, Text, Icon, Form, Header, Item, Input } from 'native-base';
+import { Container, Text, Icon, Form, Header, Item, Input } from 'native-base';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Image, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { StyleSheet, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
 import { firebase } from '../../firebase';
-import { DATAMALL_API } from '@env'
-import axios from 'axios'
-import BusTimings from './BusTimings'
+import BusTimings from './BusTimings';
+import { searchFilter } from '../backend/functions'
 
 function BusArrivalScreen() {
-    const navigation = useNavigation();
     const [loading, setLoading] = useState(true);
     const [busStops, setBusStops] = useState([]);
     const [expand, setExpand] = useState({"selected": null});
     const [arrayholder, setArrayholder] = useState([]);
     const [refresh, setRefresh] = useState(false);
-
-    // function busInfoComponent(bus, busStop) {
-    //   const busInfo = queryBus(bus, busStop);
-    //   return (
-    //     <Form key={bus} style={{height: 40, marginHorizontal: 30,
-    //     marginVertical: 10, borderColor: 'grey', borderBottomWidth: 1, flexDirection: 'row'}}>
-    //       <Text style={{fontWeight: 'bold', textAlignVertical: 'center', flex: 1}}>{bus}</Text>
-    //       {doneQuery ? <Text style={{textAlignVertical: 'center', flex: 1}}>{busInfo.ServiceNo}</Text>
-    //       : <Text style={{textAlignVertical: 'center', flex: 1}}>hi</Text>}
-          
-    //       <Text style={{textAlignVertical: 'center', flex: 1}}>{bus}</Text>
-    //       <Text style={{textAlignVertical: 'center', flex: 1}}>{bus}</Text>
-    //     </Form>
-    //   )
-    // }
-
-    function searchFilterFunction(text) {   
-      const newData = arrayholder.filter(item => {      
-        const itemId = item.key.toUpperCase();
-        const itemName = item.name.toUpperCase();
-        const textData = text.toUpperCase();
-        return (itemId.indexOf(textData) > -1) || (itemName.indexOf(textData) > -1);    
-        });   
-      setBusStops(newData); 
-    };
   
     useEffect(() => {
       const subscriber = firebase.firestore()
@@ -72,7 +44,10 @@ function BusArrivalScreen() {
             <Icon name="ios-search" />
             <Input
               placeholder="Search"
-              onChangeText={text => searchFilterFunction(text)}  
+              onChangeText={text => {
+                const newData = searchFilter(text, arrayholder, "key", "name");
+                setBusStops(newData);
+              }}
             />
           </Item>
         </Header>
