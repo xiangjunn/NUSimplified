@@ -13,6 +13,7 @@ function DeclareTempScreen() {
 
   async function submitDeclaration() {
     const currentTime = firebase.firestore.Timestamp.now().toDate();
+    console.log(currentTime)
     const isNormal = temperature < 375;
     const actualTemp = temperature / 10;
     const tempInfo = {
