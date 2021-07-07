@@ -1,6 +1,6 @@
-import { Container, Content, Footer, Button, Text, Left, Right, ListItem, Form } from 'native-base';
+import { Container, Content, Footer, Button, Text, Left, Right, Form, ListItem } from 'native-base';
 import React, { useState, useEffect} from 'react';
-import { Image, StyleSheet, Modal, Alert, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, Modal, Alert, TouchableOpacity, FlatList } from 'react-native';
 import { firebase } from '../../../firebase';
 
 export default function BookDetailsScreen({ route, navigation }) {
@@ -8,13 +8,13 @@ export default function BookDetailsScreen({ route, navigation }) {
     const {id} = route.params;
     const userId = firebase.auth().currentUser.uid;
     const db = firebase.firestore();
-    const [quota, setQuota] = useState();
+    const [librariesQuota, setLibrariesQuota] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [borrowed, setBorrowed] = useState(false);
     const [showDescription, setShowDescription] = useState(false);
 
     function borrow(library) {
-        if (quota > 0) {
+        if (librariesQuota[library] > 0) {
             Alert.alert("Borrow", "You have chosen to collect your book at " + library + "\n\nProceed to borrow?",
             [   { text: "No" },
                 {
@@ -31,13 +31,13 @@ export default function BookDetailsScreen({ route, navigation }) {
     }
 
     async function recordBook(library) {
-        const currQuota = await db.collection("library").doc(id).get().then(doc => doc.get("quota"));
+        const currQuota = await db.collection("library").doc(id).get().then(doc => doc.get("quota")[library]);
         // array of books borrowed by user
         const arr = await db.collection("users").doc(userId).get().then(doc => doc.get("borrowedBooks"));
         const maxBooksBorrowed = 3;
         if (currQuota > 0 && (arr == undefined || arr.length < maxBooksBorrowed)) {
             await db.collection("library").doc(id).update({
-                quota: firebase.firestore.FieldValue.increment(-1)
+                [`quota.${library}`]: firebase.firestore.FieldValue.increment(-1)
             });
             const borrowedDate = firebase.firestore.Timestamp.now().toDate();
             const dueDate = extendDate(borrowedDate, 14);
@@ -94,7 +94,16 @@ export default function BookDetailsScreen({ route, navigation }) {
         let isMounted = true;
         if (isMounted) {
             // check quota
-            db.collection("library").doc(id).onSnapshot(doc => setQuota(doc.get("quota")));
+            db.collection("library").doc(id).onSnapshot(doc => {
+              const quotaInfo = doc.get("quota");
+              let arr = [];
+              for (const library in quotaInfo)
+                arr.push({
+                  library,
+                  quota: quotaInfo[library]
+                });
+              setLibrariesQuota(arr);
+            });
 
             // check if borrowed
             db.collection("users").doc(userId).onSnapshot(doc => {
@@ -172,8 +181,27 @@ export default function BookDetailsScreen({ route, navigation }) {
             </TouchableOpacity>
 
             <Text style={styles.modalText}>Select the location you wish to collect your book.</Text>
-            
-            <ListItem onPress={() => borrow("Central Library")}>
+            <Form>
+        <FlatList
+    data={librariesQuota}
+    contentContainerStyle={{ paddingBottom: 300 }}
+    renderItem={({ item }) => ( // item represents an object of library and quota
+    <ListItem
+      onPress={() => borrow(item.library)}
+      style={{height: 120, marginVertical: 20, marginRight: 10, borderBottomColor: 'grey', borderBottomWidth: 2}}
+      thumbnail
+      key={item.library}>
+      <Left style={{flex: 1}}>
+              <Text>{item.library}</Text>
+            </Left>
+            <Right style={{flex: 1}}>
+              {item.quota ? <Text style={{color: 'green'}}>{item.quota + " Available"}</Text>
+                    : <Text style={{color: 'red'}}>Not Available</Text>}
+            </Right>
+    </ListItem>)}
+  />
+  </Form>
+            {/* <ListItem onPress={() => borrow("Central Library")}>
             <Left style={{flex: 1}}>
               <Text>Central Library</Text>
             </Left>
@@ -182,7 +210,7 @@ export default function BookDetailsScreen({ route, navigation }) {
                     : <Text style={{color: 'red'}}>Not Available</Text>}
             </Right>
           </ListItem>
-          <Form style={{flex: 8}}></Form>
+          <Form style={{flex: 8}}></Form> */}
           </Form>
         </Form>
       </Modal>
