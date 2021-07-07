@@ -1,6 +1,6 @@
 import { Container, Content, Footer, Button, Text, Left, Right, Form, ListItem } from 'native-base';
 import React, { useState, useEffect} from 'react';
-import { Image, StyleSheet, Modal, Alert, TouchableOpacity, FlatList } from 'react-native';
+import { Image, StyleSheet, Modal, Alert, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
 import { firebase } from '../../../firebase';
 
 export default function BookDetailsScreen({ route, navigation }) {
@@ -8,18 +8,19 @@ export default function BookDetailsScreen({ route, navigation }) {
     const {id} = route.params;
     const userId = firebase.auth().currentUser.uid;
     const db = firebase.firestore();
+    const [loading, setLoading] = useState(true);
     const [librariesQuota, setLibrariesQuota] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [borrowed, setBorrowed] = useState(false);
     const [showDescription, setShowDescription] = useState(false);
 
-    function borrow(library) {
-        if (librariesQuota[library] > 0) {
-            Alert.alert("Borrow", "You have chosen to collect your book at " + library + "\n\nProceed to borrow?",
+    function borrow(item) {
+        if (item.quota > 0) {
+            Alert.alert("Borrow", "You have chosen to collect your book at " + item.library + "\n\nProceed to borrow?",
             [   { text: "No" },
                 {
                   text: "Yes",
-                  onPress: () => recordBook(library),
+                  onPress: () => recordBook(item.library),
                   style: "cancel"
                 }
                 
@@ -95,16 +96,19 @@ export default function BookDetailsScreen({ route, navigation }) {
         if (isMounted) {
             // check quota
             db.collection("library").doc(id).onSnapshot(doc => {
+              console.log("being run")
+              const arr = [];
               const quotaInfo = doc.get("quota");
-              let arr = [];
-              for (const library in quotaInfo)
+              
+              for (const library in quotaInfo) {
                 arr.push({
                   library,
                   quota: quotaInfo[library]
                 });
+              }
               setLibrariesQuota(arr);
-            });
-
+              setLoading(false);
+            })
             // check if borrowed
             db.collection("users").doc(userId).onSnapshot(doc => {
                 const userBooks = doc.get("borrowedBooks");
@@ -122,7 +126,12 @@ export default function BookDetailsScreen({ route, navigation }) {
             })
         }
         return () => { isMounted = false }
-    });
+    }, []);
+
+    if (loading) {
+      return <ActivityIndicator animating={true} size="large" style={{opacity:1}} color="#999999" />
+    }
+
     return (
         <Container>
           <Content>
@@ -170,7 +179,7 @@ export default function BookDetailsScreen({ route, navigation }) {
         <Form style={styles.centeredView}>
           <Form style={styles.modalView}>
             <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} 
-            style={{flex: 1, backgroundColor: 'rgba(255,0,0,0.1)',
+            style={{height: 60, backgroundColor: 'rgba(255,0,0,0.1)',
                     borderTopLeftRadius: 20, borderWidth: 2, borderColor: 'red', borderTopRightRadius: 20}}>
                       <Form style={{flex: 1}}></Form>
                       <Form style={{flex: 1}}>
@@ -184,12 +193,11 @@ export default function BookDetailsScreen({ route, navigation }) {
             <Form>
         <FlatList
     data={librariesQuota}
-    contentContainerStyle={{ paddingBottom: 300 }}
+    contentContainerStyle={{ paddingBottom: 100 }}
+    keyExtractor={item => item.library}
     renderItem={({ item }) => ( // item represents an object of library and quota
     <ListItem
-      onPress={() => borrow(item.library)}
-      style={{height: 120, marginVertical: 20, marginRight: 10, borderBottomColor: 'grey', borderBottomWidth: 2}}
-      thumbnail
+      onPress={() => borrow(item)}
       key={item.library}>
       <Left style={{flex: 1}}>
               <Text>{item.library}</Text>

@@ -69,7 +69,7 @@ export default function LoanScreen() {
                 borrowedBooks: firebase.firestore.FieldValue.arrayRemove(selected)        
             });
             batch.update(bookRef, {
-                quota: firebase.firestore.FieldValue.increment(1)
+                    [`quota.${selected.library}`]: firebase.firestore.FieldValue.increment(1)
             });
             batch.commit().then(() => {
                 setModalVisible(!modalVisible);
