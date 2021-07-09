@@ -1,5 +1,5 @@
 import { Container, Text, Icon, Form, Header, Item, Input, Button } from 'native-base';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
 import { firebase } from '../../firebase';
 import BusTimings from './BusTimings';
@@ -8,8 +8,9 @@ import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
 
 function BusArrivalScreen() {
+    const isInitialMount = useRef(true);
     const [loading, setLoading] = useState(true);
-    const [currentCoordinates, setCurrentCoordinates] = useState(null);
+    const [location, setLocation] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
     const [busStops, setBusStops] = useState([]);
     const [expand, setExpand] = useState({"selected": null});
@@ -17,47 +18,51 @@ function BusArrivalScreen() {
     const [refresh, setRefresh] = useState(false);
   
     useEffect(() => {
-      const subscriber = firebase.firestore()
-        .collection('busStops')
-        .onSnapshot(querySnapshot => {
-          const arr = []
-          querySnapshot.forEach(documentSnapshot => {
-            arr.push({
-              ...documentSnapshot.data(),
-              key: documentSnapshot.id,
-            });
-          });
-          setArrayholder(arr)
-          setBusStops(arr);
-        });
-
         (async () => {
           let { status } = await Location.requestForegroundPermissionsAsync();
           if (status !== 'granted') {
             setErrorMsg('Permission to access location was denied');
             return;
           }
-    
-          await Location.watchPositionAsync({timeInterval: 5000, distanceInterval: 10}, setCoordinates)
-          setLoading(false);
+          await Location.watchPositionAsync({timeInterval: 5000, distanceInterval: 10}, setCurrentLocation);   
         })();
-    
-      // Unsubscribe from events when no longer in use
-      return () => subscriber();
     }, []);
 
-    function setCoordinates(location) {
-      const coordinates = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude
+    useEffect(() => {
+      if (isInitialMount.current) {
+        isInitialMount.current = false;
+     } else {
+      firebase.firestore()
+      .collection('busStops')
+      .onSnapshot(querySnapshot => {
+        const arr = []
+        querySnapshot.forEach(documentSnapshot => {
+          arr.push({
+            ...documentSnapshot.data(),
+            key: documentSnapshot.id,
+            distance: findDistance(location, documentSnapshot.get("location"))
+          });
+        });
+        arr.sort((busStop1, busStop2) => busStop1.distance - busStop2.distance)
+        setArrayholder(arr);
+        setBusStops(arr);
+        setLoading(false);
+      });
+     }
+    }, [location])
+
+    function setCurrentLocation(currentLocation) {
+      const locationObject = {
+        latitude: currentLocation.coords.latitude,
+        longitude: currentLocation.coords.longitude
       }
-      setCurrentCoordinates(coordinates);
+      setLocation(locationObject);
     }
 
-    // coordinates consist of 2 keys namely latitude and longitude
-    function findDistance(firstCoordinates, secondCoordinates) {
-      const distance = getDistance(firstCoordinates, secondCoordinates);
-      return distance + "m";
+    // location consist of 2 keys namely latitude and longitude
+    function findDistance(firstLocation, secondLocation) {
+      const distance = getDistance(firstLocation, secondLocation);
+      return distance;
     }
 
     if (loading) {
@@ -92,7 +97,8 @@ function BusArrivalScreen() {
             <Form flexDirection='row'>
           <Text style={{fontWeight: 'bold'}}>{item.name}</Text>
           <Text style={styles.distance}>
-            {currentCoordinates ? findDistance(currentCoordinates, currentCoordinates): ""}</Text>
+            {item.distance + "m"}
+          </Text>
           </Form>
           <Text>{item.key}</Text>
           </Form>
