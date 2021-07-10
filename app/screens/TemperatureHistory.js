@@ -2,49 +2,58 @@ import { Container, Content, Text, Form, List, ListItem } from 'native-base';
 import React, { useState, useEffect} from 'react';
 import { StyleSheet } from 'react-native';
 import { firebase } from '../../firebase';
-import { getDay } from '../backend/functions'
 
 function TemperatureHistory() {
   const [temperatureInfo, setTemperatureInfo] = useState([])
 
   const userId = firebase.auth().currentUser.uid;
 
-  function dateToString(date) {
-    const dd = date.getDate();
-    const mm = date.getMonth() + 1;
-    const y = date.getFullYear();
-
-    return dd + '/'+ mm + '/'+ y;
-  }
-
-  function getTime(date) {
-    let hr = date.getHours();
-    let min = date.getMinutes();
-    hr = hr < 10 ? '0' + hr : hr.toString(); 
-    min = min < 10 ? '0' + min : min.toString(); 
-    return hr + ':'+ min;
-  }
-
   async function createComponents(temperatureHistory) {
     let components = [];
-    for (let i = temperatureHistory.length - 1; i >= 0; i--) {
-      const record = temperatureHistory[i];
-        const temperature = record.temperature;
-        const date = record.timestamp.toDate();
-        const isNormal = record.isNormal;
+    const sorted = Object.keys(temperatureHistory)
+      .sort((a, b) => a < b)
+      .map(date => {
+          return {
+            ...temperatureHistory[date],
+            date
+          }
+      });
+    for (let i = 0; i < sorted.length; i++) {
+      const record = sorted[i];
+      const date = record.date;
+      let temperatureAM = "";
+      let temperaturePM = "";
+      let day = "";
+      let isNormalAM = true;
+      let isNormalPM = true;
+      if (record.AM) {
+        temperatureAM = record.AM.temperature;
+        day = record.AM.day;
+        isNormalAM = record.AM.isNormal;
+      }
+      if (record.PM) {
+        temperaturePM = record.PM.temperature;
+        day = record.PM.day;
+        isNormalPM = record.PM.isNormal;
+      }
         components.push(
         <ListItem
         style={{height: 70, marginVertical: 10, marginRight: 10, borderBottomColor: 'grey', borderBottomWidth: 2}}
         key={i}>
         <Form style={styles.list}>
               <Text style={styles.listText}>
-                {dateToString(date) + '\n' + getDay(date) + '\n' + getTime(date)}
+                {date + '\n' + day}
               </Text>
-              <Text style={[styles.listText, temperature >= 37.5 ? {color: 'red'} : {}]}>
-                {temperature.toFixed(1)}
+              <Form style={{flexDirection: 'row', flex: 1}}>
+              <Text style={[styles.listText, temperatureAM >= 37.5 ? {color: 'red'} : {}]}>
+                {temperatureAM ? temperatureAM.toFixed(1) : ""}
               </Text>
+              <Text style={[styles.listText, temperaturePM >= 37.5 ? {color: 'red'} : {}]}>
+                {temperaturePM ? temperaturePM.toFixed(1) : ""}
+              </Text>
+              </Form>
               <Text style={styles.listText}>
-                {isNormal ? '-' : 'Above\nnormal'}
+                {isNormalAM && isNormalPM ? '-' : 'Above\nnormal'}
               </Text>
             </Form>
       </ListItem>
@@ -69,9 +78,21 @@ function TemperatureHistory() {
               <Text style={styles.headerText}>
                 Date
               </Text>
+              <Form>
               <Text style={styles.headerText}>
                 Temperature
               </Text>
+              <Form style={{flexDirection: 'row'}}>
+                <Form style={{flex: 1}}>
+                <Text style={{textAlign: 'center', flex: 1}}>AM</Text>
+                </Form>
+                <Form style={{flex: 1}}>
+                <Text style={{textAlign: 'center', flex: 1}}>PM</Text>
+                </Form>
+              
+              
+              </Form>
+              </Form>
               <Text style={styles.headerText}>
                 Remarks
               </Text>
