@@ -24,7 +24,7 @@ function BookingScreen() {
             </Header>
           <Form style={{flex: 1, justifyContent: 'center'}}>
           <LinearGradient
-        colors={['#d9a7c7', '#fffcdc']}
+        colors={['#06beb6', '#48b1bf']}
         start={[0, 1]}
         end={[1, 0]}
         style={styles.view}>
@@ -33,6 +33,15 @@ function BookingScreen() {
           </TouchableOpacity>
         </LinearGradient>
           <LinearGradient
+        colors={['#2193b0', '#6dd5ed']}
+        start={[0, 1]}
+        end={[1, 0]}
+        style={styles.view}>
+          <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate('AcademicBooking')}}>
+          <Label style={[styles.text, {color: 'black'}]}>{"Learning\nFacilities"}</Label>
+          </TouchableOpacity>
+        </LinearGradient>
+        <LinearGradient
         colors={['#0cebeb', '#20e3b2', '#29ffc6']}
         start={[0, 1]}
         end={[1, 0]}
@@ -78,10 +87,10 @@ const styles = StyleSheet.create({
     },
     view: {
       width: '80%',
-      height: '40%',
+      height: '25%',
       alignSelf: 'center',
       justifyContent: 'center',
-      margin: '7%',
+      margin: '2%',
       borderRadius: 40
     },
     text: {
