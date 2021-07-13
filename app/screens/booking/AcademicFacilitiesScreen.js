@@ -7,7 +7,7 @@ import { searchFilter } from '../../backend/functions';
 
 function AcademicFacilitiesScreen({ route }) {
     const navigation = useNavigation();
-    const { location } = route.params;
+    const { location, name } = route.params;
     const [loading, setLoading] = useState(true);
     const [arrayholder, setArrayholder] = useState([]);
     const [venues, setVenues] = useState([]);
@@ -57,7 +57,7 @@ function AcademicFacilitiesScreen({ route }) {
     contentContainerStyle={{ paddingBottom: 300 }}
     renderItem={({ item }) => ( // item represents a venue
     <ListItem
-      onPress={() => navigation.navigate('AcademicSlots', {location, venue: item.key})}
+      onPress={() => navigation.navigate('AcademicSlots', {location, name, venue: item.key})}
       style={{height: 80, marginVertical: 20, marginRight: 10}}
       key={item.key}>
         <Text style={{fontWeight: 'bold', color: '#0645AD', textAlign: 'center', flex: 1}}>{item.key}</Text>

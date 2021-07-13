@@ -2,10 +2,12 @@ import { Container, Content, Button, Text, Form, Card } from 'native-base';
 import React, { useState } from 'react';
 import { StyleSheet, Alert } from 'react-native';
 import {Calendar} from 'react-native-calendars';
+import acadBooking from '../../backend/acadBooking.json'
 import { firebase } from '../../../firebase';
+import { getDay } from '../../backend/functions';
 
-function SlotsScreen({ route }) {
-    const { location, venue } = route.params;
+function AcademicSlotsScreen({ route }) {
+    const { location, name, venue } = route.params;
     const currentDate = firebase.firestore.Timestamp.now().toDate();
     const advanceDate = extendDate(currentDate, 14);
     const [date, setDate] = useState();
@@ -40,23 +42,11 @@ function SlotsScreen({ route }) {
                 const jsDate = new Date(date);
                 const day = getDay(jsDate);
                 if (!selectedSlot) { // slots for the selected date is not available in database, need to add
-                    let json = {};
-                    const sports = {
-                        "badminton" : badmintonBooking,
-                        "squash" : squashBooking,
-                        "tennis" : tennisBooking,
-                        "tableTennis" : tableTennisBooking
-                    }
-                    if (day == 'Saturday' || day == 'Sunday') {
-                        json = sports[sport][location].peak;
-                    } else {
-                        json = sports[sport][location].nonPeak;
-                    }
                     selectedSlot = {
-                        ...json,
+                        ...acadBooking,
                         day
                     }
-                    await firebase.firestore().collection(sport).doc(location).set({
+                    await firebase.firestore().collection(location).doc(venue).set({
                         ...doc.data(),
                         [date] : selectedSlot
                     })
@@ -64,36 +54,17 @@ function SlotsScreen({ route }) {
                         console.log("Document successfully added!");
                     })
                     .catch((error) => {
-                        console.error("Error writing document: ", error);
+                        alert(error);
                     });
                 }
-                const courts = selectedSlot.courts;
-                let index = -1; // because increment before calling function, so first index will be 0
-                const componenentArray = courts.map(
-                    court => {
-                        index++
-                        return createCourtComponent(court, courts, index)
-                    });
+                const timeslots = selectedSlot.timeslots;
+                const componenentArray = createButtonsComponent(timeslots);
                 setSlotsInfo(componenentArray);
             })
         }
     }
 
-    function createCourtComponent(court, courts, index) {
-        const id = court.courtNumber;
-        return (
-        <Card key={id}>
-        <Form style={{margin: 20}}>
-        <Text style={{fontSize: 25}}>{titleCase(sport) + ' Court ' + id}</Text>
-        <Text>Each slot is 1 hour and represents the start time of the slot.</Text>
-        {createButtonsComponent(court, courts, index)}
-        </Form>
-        </Card>
-        )
-    }
-
-    function createButtonsComponent(court, courts, index) {
-        const timeslots = court.timeslots;
+    function createButtonsComponent(timeslots) {
         let rowNumber = 1;
         let components = [];
         for (let i = 0; i < timeslots.length; i += 4) {
@@ -108,15 +79,13 @@ function SlotsScreen({ route }) {
                             style={[{width: '23%', marginHorizontal: '1%'}, currSlot.isAvailable ? styles.available : styles.unavailable]}
                             onPress={() => {
                                 if (currSlot.isAvailable) {
-                                    const period = currSlot.isPeak ? "Period: Peak" : "Period: Non-peak";
-                                    const body = "Court selected: " + court.courtNumber
-                                                    + "\nTimeslot selected: " + currSlot.time + "\n" + period
+                                    const body = "Timeslot selected: " + currSlot.time
                                                     + "\n\nProceed to book?";
-                                    Alert.alert(name, body, [
+                                    Alert.alert(venue, body, [
                                     { text: "No" },
                                     {
                                     text: "Yes",
-                                    onPress: () => bookCourt(currSlot, courts, index),
+                                    onPress: () => bookVenue(currSlot, timeslots),
                                     style: "cancel"
                                     }
                                     
@@ -133,18 +102,16 @@ function SlotsScreen({ route }) {
         return components;
     }
 
-    async function bookCourt(currSlot, courts, index) {
-        const sfDocRef = firebase.firestore().collection(sport).doc(location);
+    async function bookVenue(currSlot, currTimeslots) {
+        const sfDocRef = firebase.firestore().collection(location).doc(venue);
         const userInfo = firebase.firestore().collection("users").doc(userId);
-        const courtNumber = courts[index].courtNumber;
         const time = currSlot.time;
         firebase.firestore().runTransaction((transaction) => {
         return transaction.get(sfDocRef).then(async (sfDoc) => {
             if (!sfDoc.exists) {
                 throw "Document does not exist!";
             }
-            const court = sfDoc.get(date).courts[index];
-            const timeslots = court.timeslots;
+            const timeslots = sfDoc.get(date).timeslots;
             let isAvailable = false;
             for (let i = 0; i < timeslots.length; i++) {
                 if (timeslots[i].time === currSlot.time) {
@@ -152,7 +119,7 @@ function SlotsScreen({ route }) {
                     break;
                 }
             }
-            const userBookings = await firebase.firestore().collection("users").doc(userId).get().then(doc => doc.get("bookings"));
+            const userBookings = await firebase.firestore().collection("users").doc(userId).get().then(doc => doc.get("academicBookings"));
             let canBook = true;
             if (userBookings) {
                 for (let i = 0; i < userBookings.length; i++) {
@@ -164,17 +131,15 @@ function SlotsScreen({ route }) {
             }
             
             if (isAvailable && canBook) {
-                const reference = date + '.' + 'courts';
                 currSlot.isAvailable = false;
                 const slotInfo = {
                     date,
-                    courtNumber,
                     time,
-                    activity: sport,
-                    location: name
+                    venue,
+                    name,
                 }
-                transaction.update(userInfo, { bookings : firebase.firestore.FieldValue.arrayUnion(slotInfo) }); 
-                transaction.update(sfDocRef, { [reference] : courts });
+                transaction.update(userInfo, { academicBookings : firebase.firestore.FieldValue.arrayUnion(slotInfo) }); 
+                transaction.update(sfDocRef, { [`${date}.timeslots`] : currTimeslots });
                 return true;
                
             } else if (!isAvailable) {
@@ -187,12 +152,12 @@ function SlotsScreen({ route }) {
         });
             }).then(success => {
                 if (success) {
-                    Alert.alert("Success", "You have booked court " + courtNumber + " at " + time + " located at " + name);
+                    Alert.alert("Success", "You have booked " + venue + " at " + time + " located at " + name);
                     displaySlots();
                 }
             })
             .catch((err) => {
-                console.error(err);
+                alert(err);
             });
         }
 
@@ -232,7 +197,14 @@ function SlotsScreen({ route }) {
                 <Form style={{height: 20, width: 20, backgroundColor: 'red'}}></Form>
                 <Text style={{marginLeft: 5}}>Unavailable</Text>
                 </Form>
-                {slotsInfo}
+                <Card>
+                    <Form style={{margin: 20}}>
+                    <Text style={{fontSize: 25, textAlign: 'center', flex: 1}}>{venue}</Text>
+                    <Text>Each slot is 1 hour and represents the start time of the slot.</Text>
+                    {slotsInfo}
+                    </Form>
+                </Card>
+                
             </Content>
         </Container>
     );
@@ -247,4 +219,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default SlotsScreen;
+export default AcademicSlotsScreen;

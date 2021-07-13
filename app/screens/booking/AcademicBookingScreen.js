@@ -9,7 +9,8 @@ function AcademicBookingScreen() {
     return (
         <Container >
             <Content>
-                <TouchableOpacity onPress={() => navigation.navigate("AcademicFacilities", {location: "educationResourceCentre"})}>
+                <TouchableOpacity onPress={
+                    () => navigation.navigate("AcademicFacilities", {location: "educationResourceCentre", name: "Education Resource Centre"})}>
                 <Card>
                 <CardItem cardBody>
                 <Image source={require("../../assets/educationResourceCentre.jpg")} style={{height: 250, width: null, flex: 1}}/>
@@ -20,7 +21,8 @@ function AcademicBookingScreen() {
                 </Card>
                 </TouchableOpacity>  
                 <Form style={{height: 10}}></Form>
-                <TouchableOpacity onPress={() => navigation.navigate("AcademicFacilities", {location: "stephenRiadyCentre"})}>
+                <TouchableOpacity onPress={
+                    () => navigation.navigate("AcademicFacilities", {location: "stephenRiadyCentre", name: "Stephen Riady Centre"})}>
                 <Card>
                 <CardItem cardBody>
                 <Image source={require("../../assets/stephenRiadyCentre.jpg")} style={{height: 250, width: null, flex: 1}}/>
@@ -31,7 +33,8 @@ function AcademicBookingScreen() {
                 </Card>
                 </TouchableOpacity>
                 <Form style={{height: 10}}></Form>
-                <TouchableOpacity onPress={() => navigation.navigate("AcademicFacilities", {location: "townPlaza"})}>
+                <TouchableOpacity onPress={
+                    () => navigation.navigate("AcademicFacilities", {location: "townPlaza", name: "Town Plaza"})}>
                 <Card>
                 <CardItem cardBody>
                 <Image source={require("../../assets/townPlaza.jpg")} style={{height: 250, width: null, flex: 1}}/>

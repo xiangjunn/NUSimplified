@@ -1,0 +1,14 @@
+    { "timeslots": [
+        {"time": "0900", "isAvailable": true},
+        {"time": "1000", "isAvailable": true},
+        {"time": "1100", "isAvailable": true},
+        {"time": "1200", "isAvailable": true},
+        {"time": "1300", "isAvailable": true},
+        {"time": "1400", "isAvailable": true},
+        {"time": "1500", "isAvailable": true},
+        {"time": "1600", "isAvailable": true},
+        {"time": "1700", "isAvailable": true},
+        {"time": "1800", "isAvailable": true},
+        {"time": "1900", "isAvailable": true},
+        {"time": "2000", "isAvailable": true}]}
+    
