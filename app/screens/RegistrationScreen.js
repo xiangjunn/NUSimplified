@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
-import { StyleSheet, TouchableOpacity } from 'react-native'
+import { StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { firebase } from '../../firebase'
-import { Container, Content, Form, Input, Button, Text, Label } from 'native-base';
+import { Container, Content, Form, Input, Button, Text, Label, Footer } from 'native-base';
+import { Popup, Toast } from 'popup-ui';
 
 export default function RegistrationScreen() {
     const navigation = useNavigation();
+    const [loading, setLoading] = useState(false);
+
     const [firstName, setFirstName] = useState('')
     const [firstNameSelected, setFirstNameSelected] = useState(false)
 
@@ -35,6 +38,7 @@ export default function RegistrationScreen() {
 
 
     const onRegisterPress = () => {
+        setLoading(true);
         // remove whitespaces for first name, last name and email
         const firstNameModified = firstName.trim()
         const lastNameModified = lastName.trim()
@@ -43,15 +47,55 @@ export default function RegistrationScreen() {
         // check if all text fields are filled
         if (!(firstNameModified && lastNameModified && emailModified && password && confirmPassword)) {
             alert("Please fill up all text fields.")
+            setLoading(false);
             return
         } else if (!emailModified.endsWith("@u.nus.edu")) { // check if it is NUS registered email
-            alert("This is not a NUS registered email!")
+            Toast.show({
+                title: 'Failed to create account',
+              text:
+                'This is not a NUS registered email!',
+              color: '#e74c3c',
+              timing: 3000,
+              icon: (
+                <Image
+                  source={require('../assets/close.png')}
+                  style={{ width: 25, height: 25 }}
+                  resizeMode="contain"
+                />)
+              });
+              setLoading(false);
             return
         } else if (password.length < 8) {
-            alert("Password must be at least 8 characters long")
+            Toast.show({
+                title: 'Failed to create account',
+              text:
+                'Password must be at least 8 characters long',
+              color: '#e74c3c',
+              timing: 3000,
+              icon: (
+                <Image
+                  source={require('../assets/close.png')}
+                  style={{ width: 25, height: 25 }}
+                  resizeMode="contain"
+                />)
+              });
+              setLoading(false);
             return
         } else if (password !== confirmPassword) {
-            alert("Passwords don't match.")
+            Toast.show({
+                title: 'Failed to create account',
+              text:
+              "Passwords don't match.",
+              color: '#e74c3c',
+              timing: 3000,
+              icon: (
+                <Image
+                  source={require('../assets/close.png')}
+                  style={{ width: 25, height: 25 }}
+                  resizeMode="contain"
+                />)
+              });
+              setLoading(false);
             return
         }
         firebase
@@ -73,26 +117,51 @@ export default function RegistrationScreen() {
                         firebase.auth().currentUser.sendEmailVerification()
                         .then(function() {
                           // Verification email sent.
-                          alert("Registration successful! An email verification has been sent to your email address.")
+                          Popup.show({
+                            type: 'Success',
+                            title: 'Successful Registration',
+                            button: true,
+                            textBody: 'An email verification has been sent to your email address',
+                            buttontext: 'Ok',
+                            callback: () => Popup.hide(),
+                          })
                           firebase.auth().signOut()
                           navigation.replace('Login')
                         })
                         .catch(function(error) {
                         // Error occurred. Inspect error.code.
                             console.log(error)
+                            setLoading(false);
                         });
                     })
                     .catch((error) => {
                         alert(error)
+                        setLoading(false);
                     });
             })
             .catch((error) => {
-                alert(error)
+                setLoading(false);
+                const inUse = "Error: The email address is already in use by another account."
+                if (error == inUse) {
+                    Toast.show({
+                        title: 'The email address is already in use by another account.',
+                        color: '#f39c12',
+                        timing: 3000,
+                        icon: (
+                          <Image
+                            source={require('../assets/warning.png')}
+                            style={{ width: 25, height: 25 }}
+                            resizeMode="contain"
+                          />
+                        ),
+                      })
+                }
         });
     }
 
     return (
         <Container>
+            
             <Content style={styles.particularsArea}>
                 <Form>
                     {/** first name textbox */}
@@ -197,7 +266,9 @@ export default function RegistrationScreen() {
 
                 {/** Signup button */}
                 <Button rounded style={styles.margin} onPress={onRegisterPress}>
-                    <Text style={styles.textAlign} >Sign up</Text>
+                    {loading ? <ActivityIndicator animating={true} size="large" style={{flex: 1, alignSelf: 'center'}} color="#999999" />
+                    : <Text style={styles.textAlign} >Sign up</Text>}
+                    
                 </Button>
                 
                 {/** Login button */}
@@ -210,6 +281,7 @@ export default function RegistrationScreen() {
                 </Form>
             </Content>
         </Container>
+        
     )
 }
 

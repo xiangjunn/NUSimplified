@@ -8,7 +8,9 @@ import { StyleSheet } from 'react-native'
 import { firebase } from './firebase';
 import LoginScreen from './app/screens/LoginScreen';
 import RegistrationScreen from './app/screens/RegistrationScreen';
-import MainNavigator from './app/container/MainNavigator'
+import MainNavigator from './app/container/MainNavigator';
+import { Root } from 'popup-ui';
+
 
 
 
@@ -35,6 +37,7 @@ export default function App() {
     )
   } else {
     return (
+      <Root>
       <NavigationContainer>
         {!isSignedIn ?
         <Stack.Navigator screenOptions={headerLooks}>
@@ -60,6 +63,7 @@ export default function App() {
 
         
       </NavigationContainer>
+      </Root>
     );
     }
   }

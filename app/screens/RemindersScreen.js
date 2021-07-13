@@ -1,10 +1,11 @@
-import { Container, Content, Footer, FooterTab, Button, Text, Icon, Header, Body, Left, Right, Form } from 'native-base';
+import { Container, Content, Footer, FooterTab, Button, Icon, Header, Body, Left, Right, Form } from 'native-base';
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, TouchableOpacity, Platform, Alert, Linking, NativeModules } from 'react-native';
+import { StyleSheet, TouchableOpacity, Platform, Alert, Linking, NativeModules, FlatList, View, Text, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { firebase } from '../../firebase';
+import { Root, Popup, Toast } from 'popup-ui';
 
 const { RNAndroidOpenSettings } = NativeModules;
 
@@ -16,38 +17,91 @@ Notifications.setNotificationHandler({
   }),
 });
 
+openAppSettings = () => {
+  if (Platform.OS === 'ios') {
+    Linking.openURL("app-settings:");
+  } else {
+    RNAndroidOpenSettings.appDetailsSettings();
+  }
+}
+
 function RemindersScreen() {
     const navigation = useNavigation();
+    const userId = firebase.auth().currentUser.uid;
     const homeStyle = styles.others;
     const bookingStyle = styles.others;
     const borrowStyle = styles.others;
     const remindersStyle = styles.selected;
     const [expoPushToken, setExpoPushToken] = useState('');
-    const [notification, setNotification] = useState(false);
+    const [reminders, setReminders] = useState([]);
     const notificationListener = useRef();
     const responseListener = useRef();
 
-    openAppSettings = () => {
-      if (Platform.OS === 'ios') {
-        Linking.openURL("app-settings:");
-      } else {
-        RNAndroidOpenSettings.appDetailsSettings();
+    async function scheduleNotification() {
+      console.log(firebase.firestore.Timestamp.now().toDate())
+      const identifier = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Time's up!",
+          body: 'Change sides!',
+        },
+        trigger: {
+          // repeats: true,
+          // weekday: 3, //Sunday
+          // hour: 20,
+          // minute: 0
+          seconds: 2,
+        }
+      });
+      const info = {
+        title: "Time's up",
+        body: "BAKANA!",
+        frequency: "Once"
       }
+      firebase.firestore().collection("users").doc(userId).update({
+        [`notifications.${identifier}`]: info
+      }
+      ).then(() =>  Toast.show({
+        title: 'Profile edited',
+      text:
+        'Your profile has been edited, you can now see your new information.',
+      color: '#f39c12',
+      timing: 2000,
+      icon: (
+        <Image
+          source={require('../assets/warning.png')}
+          style={{ width: 25, height: 25 }}
+          resizeMode="contain"
+        />)
+      }))
     }
 
+   
     
     useEffect(() => {
       registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
   
       // This listener is fired whenever a notification is received while the app is foregrounded
       notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-        setNotification(notification);
+        console.log(notification);
       });
   
       // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
       responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
         console.log(response);
       });
+
+      firebase.firestore().collection('users').doc(userId).onSnapshot(query => {
+        const notifications = query.get("notifications");
+        if (notifications) {
+            const arr = Object.keys(notifications).map(id => {
+              return {
+                ...notifications[id],
+                id
+              }
+            })
+            setReminders(arr);
+        } 
+        });
   
       return () => {
         Notifications.removeNotificationSubscription(notificationListener.current);
@@ -56,6 +110,7 @@ function RemindersScreen() {
     }, []);
 
     return (
+      <Root>
         <Container >
           <Header androidStatusBarColor='#62B1F6' style={{backgroundColor: '#62B1F6'}}>
           <Left>
@@ -66,26 +121,33 @@ function RemindersScreen() {
           <Body/>
           <Right/>
             </Header>
-          <Content>
-            <Form
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'space-around',
-        }}>
-        <Text>Your expo push token: {expoPushToken}</Text>
-        <Form style={{ alignItems: 'center', justifyContent: 'center' }}>
-          <Text>Title: {notification && notification.request.content.title} </Text>
-          <Text>Body: {notification && notification.request.content.body}</Text>
-          <Text>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>
+            <Text style={{marginLeft: "3%", fontSize: 50}}>Reminders</Text>
+            {/* <FlatList
+      data={reminders}
+      contentContainerStyle={{ paddingBottom: 200 }}
+      renderItem={({ item }) => ( // item represents a reminder
+        <Form key={item.key} style={{margin: 20, borderBottomWidth: 2, borderBottomColor: 'grey'}}>
+        <Text style={{flex: 1, fontWeight: 'bold', color: '#0645AD', fontSize: 25, marginBottom: 5}}>{item.key}</Text>
         </Form>
+        )} 
+    /> */}
+    <Content>
+      <Text>yoyo</Text>
+   
         <Button
-          title="Press to Send Notification"
+            onPress={async () => {
+              await scheduleNotification();
+               
+            }}
+        >
+            <Text>Open Popup</Text>
+        </Button>
+        
+          <Button
           onPress={async () => {
-            await scheduleNotification();
+            await Notifications.cancelAllScheduledNotificationsAsync();
           }}
-        ><Text>LOL</Text></Button>
-      </Form>
+        ><Text>cancel all notif :D</Text></Button>
           </Content>
           <Footer style={{backgroundColor: '#62B1F6'}}>
             <FooterTab>
@@ -111,42 +173,12 @@ function RemindersScreen() {
             </FooterTab>
           </Footer>
         </Container>
+        </Root>
     );
 }
 
-async function scheduleNotification() {
-  const trigger = new Date(Date.UTC(2021, 6, 5) - 60 * 60 * 8 * 1000);
-  console.log(trigger)
-  console.log(firebase.firestore.Timestamp.now().toDate())
-  Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Time's up!",
-      body: 'Change sides!',
-    },
-    trigger,
-  });
-}
 
-// Can use this function below, OR use Expo's Push Notification Tool-> https://expo.io/notifications
-async function sendPushNotification(expoPushToken) {
-  const message = {
-    to: expoPushToken,
-    sound: 'default',
-    title: 'Original Title',
-    body: 'And here is the body!',
-    data: { someData: 'goes here' },
-  };
 
-  await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Accept-encoding': 'gzip, deflate',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  });
-}
 
 async function registerForPushNotificationsAsync() {
   let token;
