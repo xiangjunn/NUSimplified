@@ -7,7 +7,9 @@ import { StyleSheet, Modal, TouchableOpacity, Alert } from 'react-native';
 function LoginAuth() {
     const navigation = useNavigation();
     const [email, setEmail] = useState('')
+    const [emailSelected, setEmailSelected] = useState(false)
     const [password, setPassword] = useState('')
+    const [passwordSelected, setPasswordSelected] = useState(false)
     const [modalVisible, setModalVisible] = useState(false);
     const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
 
@@ -55,25 +57,31 @@ function LoginAuth() {
         <Content style={styles.login}>
             <Form>
               {/** Email textbox */}
-              <Item rounded last>
-                <Icon type='FontAwesome5' name='envelope' />
+              <Item rounded last style={emailSelected ? {borderColor: "#00BBBB"} : {}}>
+                <Icon type='FontAwesome5' name='envelope' style={emailSelected ? {color: "#00BBBB"} : {}}/>
                 <Input
                   keyboardType='email-address'
                   placeholder='Email'
                   underlineColorAndroid="transparent"
                   onChangeText={(text) => setEmail(text)}
-                  value={email}>
+                  value={email}
+                  onFocus={() => setEmailSelected(true)}
+                  onBlur={() => setEmailSelected(false)}
+                >
                 </Input>
               </Item>
 
               {/** Password textbox */}
-              <Item rounded last>
-                <Icon type='FontAwesome5' name='key' />
+              <Item rounded last style={passwordSelected ? {borderColor: "#00BBBB"} : {}}>
+                <Icon type='FontAwesome5' name='key' style={passwordSelected ? {color: "#00BBBB"} : {}}/>
                 <Input
                   placeholder='Password'
                   secureTextEntry={true}
                   onChangeText={(text) => setPassword(text)}
-                  value={password} ></Input>
+                  value={password}
+                  onFocus={() => setPasswordSelected(true)}
+                  onBlur={() => setPasswordSelected(false)}
+                   ></Input>
               </Item>
 
               {/** "Forget password" button */}
@@ -108,7 +116,9 @@ function LoginAuth() {
                   placeholder='eg e0123456@u.nus.edu'
                   onChangeText={(text) => setForgotPasswordEmail(text)}
                   value={forgotPasswordEmail}
-                  keyboardType='number-pad' ></Input>
+                  keyboardType='number-pad'
+                >
+                </Input>
                   
             </Item>
             <Form style={{flexDirection: 'row', marginTop: 25}}>
@@ -180,6 +190,12 @@ function LoginAuth() {
         marginHorizontal: '5%',
         borderRadius: 50
     },
+    selected: {
+
+    },
+    notSelected: {
+
+    }
   })
 
   export default LoginAuth;

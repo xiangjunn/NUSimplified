@@ -1,29 +1,37 @@
 import React, { useState } from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, TouchableOpacity } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { firebase } from '../../firebase'
-import { Container, Content, Form, Item, Input, Button, Text, Label } from 'native-base';
+import { Container, Content, Form, Input, Button, Text, Label } from 'native-base';
 
 export default function RegistrationScreen() {
     const navigation = useNavigation();
     const [firstName, setFirstName] = useState('')
-    const [firstNameTitle, setFirstNameTitle] = useState(false)
+    const [firstNameSelected, setFirstNameSelected] = useState(false)
 
     const [lastName, setLastName] = useState('')
-    const [lastNameTitle, setLastNameTitle] = useState(false)
+    const [lastNameSelected, setLastNameSelected] = useState(false)
 
     const [email, setEmail] = useState('')
-    const [emailTitle, setEmailTitle] = useState(false)
+    const [emailSelected, setEmailSelected] = useState(false)
+    const [emailValidity, setEmailValidity] = useState(true)
 
     const [password, setPassword] = useState('')
-    const [passwordTitle, setPasswordTitle] = useState(false)
+    const [passwordSelected, setPasswordSelected] = useState(false)
+    const [passwordValidity, setPasswordValidity] = useState(true)
 
     const [confirmPassword, setConfirmPassword] = useState('')
-    const [confirmPasswordTitle, setConfirmPasswordTitle] = useState(false)
+    const [confirmPasswordSelected, setConfirmPasswordSelected] = useState(false)
+    const [confirmPasswordValidity, setConfirmPasswordValidity] = useState(true)
 
-    const display = (input, isDisplayed) => isDisplayed
-        ? <Label style={{marginLeft: '5%'}}>{input}</Label>
-        : <Label></Label>;    
+    const display = (input, isDisplayed, select, valid) => isDisplayed
+        ? <Label style={[{marginLeft: '1%', color: 'grey'}, select ? {color: "#00BBBB"} : {},
+        valid ? {} : {color: "#d9534f"}]}>{input}</Label>
+        : <Label></Label>;
+        
+    const showError = (message) => {
+        return <Label style={{marginLeft: '1%', color: '#d9534f', marginBottom: '1%', fontSize: 14}}>{message}</Label>;
+    }
 
 
     const onRegisterPress = () => {
@@ -38,6 +46,9 @@ export default function RegistrationScreen() {
             return
         } else if (!emailModified.endsWith("@u.nus.edu")) { // check if it is NUS registered email
             alert("This is not a NUS registered email!")
+            return
+        } else if (password.length < 8) {
+            alert("Password must be at least 8 characters long")
             return
         } else if (password !== confirmPassword) {
             alert("Passwords don't match.")
@@ -85,60 +96,104 @@ export default function RegistrationScreen() {
             <Content style={styles.particularsArea}>
                 <Form>
                     {/** first name textbox */}
-                    {display('First Name', firstNameTitle)}
-                    <Item rounded last style={styles.textbox}>
+                    {display('First Name', firstName, firstNameSelected, true)}
+                    <TouchableOpacity style={[styles.textbox, firstNameSelected ? {borderWidth: 2, borderColor: "#00BBBB"} : {}]}> 
                         <Input
                         placeholder='First name'
                         underlineColorAndroid="transparent"
-                        onChangeText={(text) => {setFirstName(text); setFirstNameTitle(text !== '')}}
-                        value={firstName}>
+                        onChangeText={(text) => setFirstName(text)}
+                        value={firstName}
+                        onFocus={() => setFirstNameSelected(true)}
+                        onBlur={() => setFirstNameSelected(false)}>
                         </Input>
-                    </Item>
+                    </TouchableOpacity>
+                    <Label style={{marginBottom: "1%"}}></Label>
 
                     {/** last name textbox */}
-                    {display('Last Name', lastNameTitle)}
-                    <Item rounded last style={styles.textbox}>
+                    {display('Last Name', lastName, lastNameSelected, true)}
+                    <TouchableOpacity style={[styles.textbox, lastNameSelected ? {borderWidth: 2, borderColor: "#00BBBB"} : {}]}>
                         <Input
                         placeholder='Last name'
                         underlineColorAndroid="transparent"
-                        onChangeText={(text) => {setLastName(text); setLastNameTitle(text !== '')}}
-                        value={lastName}>
+                        onChangeText={(text) => setLastName(text)}
+                        value={lastName}
+                        onFocus={() => setLastNameSelected(true)}
+                        onBlur={() => setLastNameSelected(false)}>
                         </Input>
-                    </Item>
+                    </TouchableOpacity>
+                    <Label style={{marginBottom: "1%"}}></Label>
 
                     {/** Email textbox */}
-                    {display('Email', emailTitle)}
-                    <Item rounded last style={styles.textbox}>
+                    {display('Email', email, emailSelected, emailValidity)}
+                    <TouchableOpacity style={
+                        [styles.textbox,
+                         emailSelected ? {borderWidth: 2, borderColor: "#00BBBB"} : {},
+                         emailValidity ? {} : styles.error]}>
                         <Input
                         keyboardType='email-address'
                         placeholder='Email'
                         underlineColorAndroid="transparent"
-                        onChangeText={(text) => {setEmail(text); setEmailTitle(text !== '')}}
-                        value={email}>
+                        onChangeText={(text) => setEmail(text)}
+                        value={email}
+                        onFocus={() => {
+                            setEmailSelected(true);
+                            setEmailValidity(true);
+                        }
+                        }
+                        onBlur={() => {
+                            setEmailSelected(false);
+                            setEmailValidity(email === "" || email.toLowerCase().trim().endsWith("@u.nus.edu"));
+                        }
+                        }>
                         </Input>
-                    </Item>
+                    </TouchableOpacity>
+                    {emailValidity ? <Label></Label> : showError("Invalid NUS Email")}
 
                     
                     {/** Password textbox */}
-                    {display('Password', passwordTitle)}
-                    <Item rounded last style={styles.textbox}>
+                    {display('Password', password, passwordSelected, passwordValidity)}
+                    <TouchableOpacity style={
+                        [styles.textbox,
+                        passwordSelected ? {borderWidth: 2, borderColor: "#00BBBB"} : {},
+                        passwordValidity ? {} : styles.error]}>
                         <Input
                         placeholder='Password'
                         secureTextEntry={true}
-                        onChangeText={(text) =>{setPassword(text); setPasswordTitle(text !== '')}}
-                        value={password} ></Input>
-                    </Item>
-
+                        onChangeText={(text) => setPassword(text)}
+                        value={password}
+                        onFocus={() => {
+                            setPasswordSelected(true);
+                            setPasswordValidity(true);
+                        }
+                        }
+                        onBlur={() => {
+                            setPasswordSelected(false);
+                            setPasswordValidity(password === "" || password.length >= 8)
+                        }}></Input>
+                    </TouchableOpacity>
+                    {passwordValidity ? <Label></Label> : showError("Must be at least 8 characters long")}
                    
                     {/** Confirm Password textbox */}
-                    {display('Confirm Password', confirmPasswordTitle)}
-                    <Item rounded last style={styles.textbox}>
+                    {display('Confirm Password', confirmPassword, confirmPasswordSelected, confirmPasswordValidity)}
+                    <TouchableOpacity style={[
+                        styles.textbox,
+                        confirmPasswordSelected ? {borderWidth: 2, borderColor: "#00BBBB"} : {},
+                        confirmPasswordValidity ? {} : styles.error]}>
                         <Input
                         placeholder='Confirm Password'
                         secureTextEntry={true}
-                        onChangeText={(text) => {setConfirmPassword(text); setConfirmPasswordTitle(text !== '')}}
-                        value={confirmPassword} ></Input>
-                    </Item>
+                        onChangeText={(text) => setConfirmPassword(text)}
+                        value={confirmPassword}
+                        onFocus={() => {
+                            setConfirmPasswordSelected(true);
+                            setConfirmPasswordValidity(true);
+                        }}
+                        onBlur={() => {
+                            setConfirmPasswordSelected(false)
+                            setConfirmPasswordValidity(password === confirmPassword)
+                        }}></Input>
+                    </TouchableOpacity>
+                    {confirmPasswordValidity ? <Label></Label> : showError("Passwords don't match")}
 
                 {/** Signup button */}
                 <Button rounded style={styles.margin} onPress={onRegisterPress}>
@@ -166,7 +221,8 @@ const styles = StyleSheet.create({
         marginTop: '5%'
     },
     textbox: {
-        marginBottom: '5%'
+        borderWidth: 1,
+        borderColor: "grey"
     },
     margin: { // for login and signup button
       marginTop: 20,
@@ -176,5 +232,9 @@ const styles = StyleSheet.create({
     textAlign: {
         flex: 1,
         textAlign: 'center'
+    },
+    error: {
+        borderWidth: 2,
+        borderColor: "#d9534f"
     }
 })
