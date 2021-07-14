@@ -1,11 +1,12 @@
-import { Container, Content, Footer, FooterTab, Button, Icon, Header, Body, Left, Right, Form } from 'native-base';
+import { Container, Content, Footer, FooterTab, Button, Icon, Header, Body, Left, Right, Card, CardItem, Form, Input, Textarea } from 'native-base';
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, TouchableOpacity, Platform, Alert, Linking, NativeModules, FlatList, View, Text, Image } from 'react-native';
+import { StyleSheet, TouchableOpacity, Platform, Alert, Linking, NativeModules, FlatList, View, Text, Image, Modal, Picker } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { firebase } from '../../firebase';
 import { Root, Popup, Toast } from 'popup-ui';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 const { RNAndroidOpenSettings } = NativeModules;
 
@@ -36,6 +37,21 @@ function RemindersScreen() {
     const [reminders, setReminders] = useState([]);
     const notificationListener = useRef();
     const responseListener = useRef();
+    const [modalVisible, setModalVisible] = useState(false);
+    const [frequency, setFrequency] = useState('');
+
+    renderRightActions = (progress) => {
+      return (
+        <Form style={styles.swipeView}>
+        <TouchableOpacity style={{backgroundColor: 'rgba(255, 255, 0, 0.3)', height: '100%', width: '50%', justifyContent: 'center', alignItems: 'center'}}>
+          <Icon type='FontAwesome5' name='edit' style={{color: 'rgb(100,100,0)'}}/>
+        </TouchableOpacity>
+        <TouchableOpacity style={{backgroundColor:'rgba(255, 0, 0, 0.4)', height: '100%', width: '50%', justifyContent: 'center', alignItems: 'center'}}>
+        <Icon type='FontAwesome5' name='trash' style={{color: 'red'}}/>
+      </TouchableOpacity>
+      </Form>
+      );
+    };
 
     async function scheduleNotification() {
       console.log(firebase.firestore.Timestamp.now().toDate())
@@ -83,6 +99,13 @@ function RemindersScreen() {
       // This listener is fired whenever a notification is received while the app is foregrounded
       notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
         console.log(notification);
+        const repeat = notification.request.trigger.repeats;
+        const identifier = notification.request.identifier;
+        if (!repeat) {
+          firebase.firestore().collection("users").doc(userId).update({
+            [`notifications.${identifier}`] : firebase.firestore.FieldValue.delete()
+          })
+        }
       });
   
       // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
@@ -115,22 +138,91 @@ function RemindersScreen() {
           <Header androidStatusBarColor='#62B1F6' style={{backgroundColor: '#62B1F6'}}>
           <Left>
             <TouchableOpacity onPress={() => navigation.openDrawer()}>
-              <Icon name='menu' style={{color: 'white'}}/>
+              
             </TouchableOpacity>
           </Left>
           <Body/>
           <Right/>
             </Header>
-            <Text style={{marginLeft: "3%", fontSize: 50}}>Reminders</Text>
-            {/* <FlatList
-      data={reminders}
-      contentContainerStyle={{ paddingBottom: 200 }}
-      renderItem={({ item }) => ( // item represents a reminder
-        <Form key={item.key} style={{margin: 20, borderBottomWidth: 2, borderBottomColor: 'grey'}}>
-        <Text style={{flex: 1, fontWeight: 'bold', color: '#0645AD', fontSize: 25, marginBottom: 5}}>{item.key}</Text>
+            <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <Form style={styles.centeredView}>
+          <Form style={styles.modalView}>
+          <Form style={{flex: 1, margin: '2%'}}>
+            <Button rounded onPress={() => setModalVisible(!modalVisible)}  style={{alignSelf: 'flex-end',
+            justifyContent: 'center', aspectRatio: 1, width: '90%', backgroundColor: 'red'}}>
+              <Icon name='times' type="FontAwesome5" style={{color: 'black', textAlign: 'center', width: '100%'}}/>
+              </Button>
+              <TouchableOpacity style={styles.textbox}>
+                        <Input
+                        placeholder='Title'
+                        underlineColorAndroid="transparent"
+                        onChangeText={(text) => {}}
+                        >
+                        </Input>
+                    </TouchableOpacity>
+                    <Textarea rowSpan={5} bordered placeholder="Message" style={{borderColor: 'grey', margin: '2%'}}/>
+                    <Form style={{flexDirection: 'row', height: '10%', margin: '2%'}}>
+                      <Text style={{textAlignVertical: 'center', fontWeight: 'bold', fontSize: 20}}>Frequency: </Text>
+                      <Picker
+                      iosHeader="Frequency"
+                      placeholder="Frequency"
+                      iosIcon={<Icon name="arrow-down" />}
+                      style={{ width: '50%', alignSelf: 'center'}}
+                      selectedValue={frequency}
+                      onValueChange={(value) => setFrequency(value)}
+                    >
+              <Picker.Item label="Once" value="key0" />
+              <Picker.Item label="Daily" value="key1" />
+              <Picker.Item label="Weekly" value="key2" />
+            </Picker>
+                    </Form>
+                   
+            </Form>
+
+            
+            <Form>
+  </Form>
+          </Form>
         </Form>
+      </Modal>
+
+            <Form style={{flexDirection: 'row', width: '100%'}}>
+              <Form style={{flex: 4}}>
+              <Text style={{marginLeft: "3%", fontSize: 50}}>Reminders</Text>
+              </Form>
+            <Form style={{flex: 1, justifyContent: 'center'}}>
+            <Button rounded onPress={() => setModalVisible(!modalVisible)}  style={{alignSelf: 'center',
+            justifyContent: 'center', aspectRatio: 1, width: '90%', backgroundColor: 'rgb(0, 255, 0)'}}>
+              <Icon name='add' style={{color: 'black', textAlign: 'center', width: '100%'}}/>
+              </Button>
+            </Form>
+            
+            </Form>
+            <Text style={{marginLeft: "3%"}}>Swipe left on the reminder to edit or remove</Text>
+            <FlatList
+      data={reminders}
+      renderItem={({ item }) => ( // item represents a reminder
+       
+    
+        <Card>
+           <Swipeable renderRightActions={renderRightActions}>
+          <CardItem style={{flexDirection: 'column'}}>
+          <Text style={{flex: 1, fontWeight: 'bold', color: '#0645AD', fontSize: 25, marginBottom: 5}}>{item.title}</Text>
+          <Text style={{flex: 1, fontWeight: 'bold', fontSize: 20, marginBottom: 5}}>{item.body}</Text>
+        <Text style={styles.text}>Fequency: {item.frequency}</Text>
+          </CardItem>   
+          </Swipeable>           
+        </Card>
+        
         )} 
-    /> */}
+    />
     <Content>
       <Text>yoyo</Text>
    
@@ -225,7 +317,41 @@ const styles = StyleSheet.create({
     },
     others: {
         color: 'white'
-    }
+    },
+    swipeView: {
+      width: '40%',
+      height: '100%',
+      flexDirection: 'row',
+    },
+    hideModal: {
+      alignSelf: 'flex-end',
+      marginRight: 10,
+      marginTop: 5,
+  },
+  centeredView: {
+      flex: 1,
+      justifyContent: "flex-end",
+    },
+    modalView: {
+      backgroundColor: "white",
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+      height: '80%'
+    },
+    textbox: {
+      borderWidth: 1,
+      borderColor: "grey",
+      height: '10%',
+      margin: '2%'
+  },
 });
 
 export default RemindersScreen;
