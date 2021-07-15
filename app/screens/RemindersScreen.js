@@ -49,7 +49,8 @@ function RemindersScreen() {
     const [date, setDate] = useState(new Date());
     const [title, setTitle] = useState('');
     const [message, setMessage] = useState('');
-    const [day, setDay] = useState(1);      
+    const [day, setDay] = useState(1);
+    const [edit, setEdit] = useState('');            
 
     function getTime(date) {
       let hr = date.getHours();
@@ -72,7 +73,30 @@ function RemindersScreen() {
       setMessage('');
       setFrequency('Once');
       setDate(new Date());
+      setDay(1);
       setOpen(false);
+      setEdit('');
+      setModalVisible(!modalVisible);
+    }
+
+    function editReminder(item) {
+      setEdit(item.id);
+      const itemDate = item.date.toDate();
+      setTitle(item.title);
+      setMessage(item.message);
+      setFrequency(item.frequency);
+      if (item.frequency === "Once") {
+        setDate(itemDate);
+      } else if (item.frequency === "Daily" || item.frequency === "Weekly") {
+        const today = new Date();
+        today.setHours(itemDate.getHours());
+        today.setMinutes(itemDate.getMinutes());
+        console.log(today)
+        setDate(today);
+      }
+      if (item.frequency === "Weekly") {
+        setDay(item.day);
+      }
       setModalVisible(!modalVisible);
     }
 
@@ -114,7 +138,6 @@ function RemindersScreen() {
     <Form style={{ flex: 1, padding: 5}}>
     <DateTimePicker
     mode="time"
-    minimumDate={new Date()}
     value={date}
     onChange={onChange}
     />
@@ -131,7 +154,6 @@ function RemindersScreen() {
     </TouchableOpacity>
     {isVisibleTime && <DateTimePicker
       mode="time"
-      minimumDate={new Date()}
       value={date}
       onChange={onChange}
     />}
@@ -175,7 +197,9 @@ function RemindersScreen() {
           style={{backgroundColor: 'rgba(255, 255, 0, 0.3)',
           height: '100%', width: '50%',
           justifyContent: 'center', alignItems: 'center'}}
-          
+          onPress={() => {
+            editReminder(item);
+        }}
           >
           <Icon type='FontAwesome5' name='edit' style={{color: 'rgb(100,100,0)'}}/>
         </TouchableOpacity>
@@ -185,7 +209,7 @@ function RemindersScreen() {
             justifyContent: 'center', alignItems: 'center'}}
             onPress={() => {
               removeReminder(item.id);
-          }}
+            }}
             >
         <Icon type='FontAwesome5' name='trash-alt' style={{color: 'red'}}/>
       </TouchableOpacity>
@@ -194,11 +218,28 @@ function RemindersScreen() {
     };
 
     async function removeReminder(id) {
+      Alert.alert("Are you sure?", "You will no longer receive any push notification for this",
+      [   { text: "No" },
+          {
+            text: "Yes",
+            onPress: () => cancelSchedule(id),
+            style: "cancel"
+          }
+          
+        ])
+    }
+    
+    function cancelSchedule(id) {
       Notifications.cancelScheduledNotificationAsync(id).then(() => {
         firebase.firestore().collection("users").doc(userId).update({
           [`notifications.${id}`] : firebase.firestore.FieldValue.delete()
         })
       })
+    }
+
+    async function updateReminder() {
+      cancelSchedule(edit);
+      scheduleNotification(frequency);
     }
 
     async function addReminder() {
@@ -223,9 +264,8 @@ function RemindersScreen() {
         addToFirebase(identifier)
       )
       .then(() => { // success
-        onClose();
         Toast.show({
-          title: 'Reminder successfully added!',
+          title: edit ? 'Reminder successfully updated!': 'Reminder successfully added!',
         text:
           '',
         color: '#2ecc71',
@@ -237,6 +277,7 @@ function RemindersScreen() {
             resizeMode="contain"
           />)
         });
+        onClose();
       })
       .catch((error) => alert(error));
     }
@@ -261,14 +302,20 @@ function RemindersScreen() {
     }
 
     function addToFirebase(id) {
+      console.log(date.getDay())
+      console.log(getDay(date))
       const details = frequency === "Once" ? `On ${displayDate(date)} at ${getTime(date)}`
         : (frequency === "Daily" ? `Everyday at ${getTime(date)}`
-          : `Every ${getDay(date)} at ${getTime(date)}`)
+          : `Every ${convertToDay[day - 1]} at ${getTime(date)}`)
       const info = {
         title,
         message,
         frequency,
-        details
+        details,
+        date
+      }
+      if (frequency === "Weekly") {
+        info.day = day;
       }
       firebase.firestore().collection("users").doc(userId).update({
         [`notifications.${id}`]: info
@@ -282,9 +329,10 @@ function RemindersScreen() {
       // This listener is fired whenever a notification is received while the app is foregrounded
       notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
         console.log(notification);
-        const repeat = notification.request.trigger.repeats;
+        const trigger = notification.request.trigger;
+        const repeat = trigger.repeats;
         const identifier = notification.request.identifier;
-        if (!repeat) {
+        if (!repeat && trigger.type !== "daily" && trigger.type !== 'weekly') {
           firebase.firestore().collection("users").doc(userId).update({
             [`notifications.${identifier}`] : firebase.firestore.FieldValue.delete()
           })
@@ -384,10 +432,16 @@ function RemindersScreen() {
                    {frequency === "Once" ? datePicker : null}
                    {frequency === "Weekly" ? dayPicker : null}
                    {frequency ? timePicker : null}
-                   {frequency ? <Button
+                   {frequency && !edit ? <Button
                                   block style={{marginTop: 5}} onPress={() => addReminder()}
                                 >
                                 <Label style={{fontWeight: 'bold', color: 'white'}}>Add</Label>
+                                </Button>
+                                : null}
+                     {frequency && edit ? <Button
+                                  block warning style={{marginTop: 5}} onPress={() => updateReminder()}
+                                >
+                                <Label style={{fontWeight: 'bold', color: 'white'}}>Update</Label>
                                 </Button>
                                 : null}
             </Form>
