@@ -1,12 +1,15 @@
 import { Container, Content, Footer, FooterTab, Button, Icon, Header, Body, Left, Right, Card, CardItem, Form, Input, Textarea } from 'native-base';
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, TouchableOpacity, Platform, Alert, Linking, NativeModules, FlatList, View, Text, Image, Modal, Picker } from 'react-native';
+import { StyleSheet, TouchableOpacity, Platform, Alert, Linking, NativeModules, FlatList, View, Text, Image, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { firebase } from '../../firebase';
 import { Root, Popup, Toast } from 'popup-ui';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import DropDownPicker from 'react-native-dropdown-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { convertToDay,convertToMonth } from '../backend/functions'
 
 const { RNAndroidOpenSettings } = NativeModules;
 
@@ -38,7 +41,34 @@ function RemindersScreen() {
     const notificationListener = useRef();
     const responseListener = useRef();
     const [modalVisible, setModalVisible] = useState(false);
-    const [frequency, setFrequency] = useState('');
+    const [frequency, setFrequency] = useState(null);
+    const [open, setOpen] = useState(false);
+    const [isVisible, setVisible] = useState(false);
+    const [date, setDate] = useState(new Date());   
+
+    const onChange = (event, selectedDate) => {
+      const currentDate = selectedDate || date;
+      setVisible(Platform.OS === 'ios');
+      setDate(currentDate);
+    };
+
+    const dateTimePicker =
+    <Form style={{height: '10%'}}>
+    <TouchableOpacity
+      onPress={() => setVisible(true)}
+      style={{}}>
+      <Text>{displayDate(date)}</Text>
+    </TouchableOpacity>
+    {isVisible && <DateTimePicker
+      mode="datetime"
+      value={date}
+      onChange={onChange}
+    />}
+    </Form>
+
+    function displayDate(date) {
+      return `${convertToDay[date.getDay()]} ${date.getDate()} ${convertToMonth[date.getMonth()]} ${date.getFullYear()}`; 
+    }
 
     renderRightActions = (progress) => {
       return (
@@ -168,22 +198,23 @@ function RemindersScreen() {
                         </Input>
                     </TouchableOpacity>
                     <Textarea rowSpan={5} bordered placeholder="Message" style={{borderColor: 'grey', margin: '2%'}}/>
-                    <Form style={{flexDirection: 'row', height: '10%', margin: '2%'}}>
-                      <Text style={{textAlignVertical: 'center', fontWeight: 'bold', fontSize: 20}}>Frequency: </Text>
-                      <Picker
-                      iosHeader="Frequency"
-                      placeholder="Frequency"
-                      iosIcon={<Icon name="arrow-down" />}
-                      style={{ width: '50%', alignSelf: 'center'}}
-                      selectedValue={frequency}
-                      onValueChange={(value) => setFrequency(value)}
-                    >
-              <Picker.Item label="Once" value="key0" />
-              <Picker.Item label="Daily" value="key1" />
-              <Picker.Item label="Weekly" value="key2" />
-            </Picker>
+                    <Form style={[{height: '20%', margin: '2%'}, Platform.OS == 'ios' ? {zIndex: 100} : {}]}>
+                      <Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 5}}>Frequency</Text>
+
+                      <DropDownPicker
+                      dropDownDirection="BOTTOM"
+                        open={open}
+                        value={frequency}
+                        items={[
+                          {label: 'Once', value: 'Once'},
+                          {label: 'Daily', value: 'Daily'},
+                          {label: 'Weekly', value: 'Weekly'},
+                        ]}
+                        setOpen={setOpen}
+                        setValue={setFrequency}
+                      />
                     </Form>
-                   
+                   {frequency === "Once" ? dateTimePicker : null}
             </Form>
 
             
