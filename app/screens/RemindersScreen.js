@@ -9,7 +9,7 @@ import { Root, Popup, Toast } from 'popup-ui';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { convertToDay,convertToMonth } from '../backend/functions'
+import { convertToDay,convertToMonth, getDay } from '../backend/functions'
 
 const { RNAndroidOpenSettings } = NativeModules;
 
@@ -43,15 +43,27 @@ function RemindersScreen() {
     const [modalVisible, setModalVisible] = useState(false);
     const [frequency, setFrequency] = useState('Once');
     const [open, setOpen] = useState(false);
-    const [isVisible, setVisible] = useState(false);
+    const [openDay, setOpenDay] = useState(false);
+    const [isVisibleDate, setVisibleDate] = useState(false);
+    const [isVisibleTime, setVisibleTime] = useState(false);
     const [date, setDate] = useState(new Date());
     const [title, setTitle] = useState('');
-    const [message, setMessage] = useState('');   
+    const [message, setMessage] = useState('');
+    const [day, setDay] = useState(1);      
+
+    function getTime(date) {
+      let hr = date.getHours();
+      let min = date.getMinutes();
+      hr = hr < 10 ? '0' + hr : hr.toString(); 
+      min = min < 10 ? '0' + min : min.toString(); 
+      return hr + ':' + min;
+    }
 
     const onChange = (event, selectedDate) => {
       console.log(selectedDate);
       const currentDate = selectedDate || date;
-      setVisible(Platform.OS === 'ios');
+      setVisibleDate(Platform.OS === 'ios');
+      setVisibleTime(Platform.OS === 'ios');
       setDate(currentDate);
     };
 
@@ -78,101 +90,191 @@ function RemindersScreen() {
   </Form>
   </Form>
   :
-    <Form style={{height: '10%'}}>
-    <TouchableOpacity
-      onPress={() => setVisible(true)}
-      style={{}}>
-      <Text>{displayDate(date)}</Text>
+  <Form style={{ margin: '2%', flexDirection: 'row', width: '100%', paddingVertical: 10,  marginBottom: 5,}}>
+  <Text style={{fontWeight: 'bold', fontSize: 20,}}>Date:</Text>
+  <Form style={{ marginHorizontal: '2%'}}>
+  <TouchableOpacity
+    onPress={() => setVisibleTime(true)}
+    style={{paddingHorizontal: 5, borderWidth: 1,}}>
+      <Text  style={{fontSize: 20}}>{displayDate(date)}</Text>
     </TouchableOpacity>
-    {isVisible && <DateTimePicker
+    {isVisibleDate && <DateTimePicker
       mode="date"
       minimumDate={new Date()}
       value={date}
       onChange={onChange}
     />}
+    </Form>
     </Form>;
 
-const timePicker =
-Platform.OS === 'ios'
-?  <Form style={{ margin: '2%', flexDirection: 'row', width: '100%'}}>
-<Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 5, paddingVertical: 10}}>Time:</Text>
-<Form style={{ flex: 1, padding: 5}}>
-<DateTimePicker
-mode="time"
-minimumDate={new Date()}
-value={date}
-onChange={onChange}
-/>
-</Form>
-</Form>
-:
-<Form style={{height: '10%'}}>
-<TouchableOpacity
-  onPress={() => setVisible(true)}
-  style={{}}>
-  <Text>{displayDate(date)}</Text>
-</TouchableOpacity>
-{isVisible && <DateTimePicker
-  mode="time"
-  minimumDate={new Date()}
-  value={date}
-  onChange={onChange}
-/>}
-</Form>;    
+  const timePicker =
+    Platform.OS === 'ios'
+    ?  <Form style={{ margin: '2%', flexDirection: 'row', width: '100%'}}>
+    <Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 5, paddingVertical: 10}}>Time:</Text>
+    <Form style={{ flex: 1, padding: 5}}>
+    <DateTimePicker
+    mode="time"
+    minimumDate={new Date()}
+    value={date}
+    onChange={onChange}
+    />
+    </Form>
+    </Form>
+    :
+    <Form style={{ margin: '2%', flexDirection: 'row', width: '100%', paddingVertical: 5,  marginBottom: 5,}}>
+    <Text style={{fontWeight: 'bold', fontSize: 20,}}>Time:</Text>
+    <Form style={{ marginHorizontal: '2%'}}>
+    <TouchableOpacity
+      onPress={() => setVisibleTime(true)}
+      style={{paddingHorizontal: 5, borderWidth: 1}}>
+      <Text style={{fontSize: 20}}>{getTime(date)}</Text>
+    </TouchableOpacity>
+    {isVisibleTime && <DateTimePicker
+      mode="time"
+      minimumDate={new Date()}
+      value={date}
+      onChange={onChange}
+    />}
+    </Form></Form>;  
+  
+  const dayPicker = 
+  <Form style={[{ margin: '2%', flexDirection: 'row'}, Platform.OS == 'ios' ? {zIndex: 100} : {}]}>
+    <Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 5, paddingVertical: 10}}>Day of the week:</Text>
+    <DropDownPicker
+    dropDownDirection="TOP"
+      open={openDay}
+      value={day}
+      showArrowIcon={false}
+      containerProps={{
+        width: '50%',
+        marginLeft: 10,
+      }}
+      items={[
+        {label: 'Sunday', value: 1},
+        {label: 'Monday', value: 2},
+        {label: 'Tuesday', value: 3},
+        {label: 'Wednesday', value: 4},
+        {label: 'Thursday', value: 5},
+        {label: 'Friday', value: 6},
+        {label: 'Saturday', value: 7},
+        
+      ]}
+      setOpen={setOpenDay}
+      setValue={setDay}
+    />
+  </Form>
 
     function displayDate(date) {
       return `${convertToDay[date.getDay()]} ${date.getDate()} ${convertToMonth[date.getMonth()]} ${date.getFullYear()}`; 
     }
 
-    renderRightActions = (progress) => {
+    renderRightActions = (progress, item) => {
       return (
         <Form style={styles.swipeView}>
-        <TouchableOpacity style={{backgroundColor: 'rgba(255, 255, 0, 0.3)', height: '100%', width: '50%', justifyContent: 'center', alignItems: 'center'}}>
+        <TouchableOpacity
+          style={{backgroundColor: 'rgba(255, 255, 0, 0.3)',
+          height: '100%', width: '50%',
+          justifyContent: 'center', alignItems: 'center'}}
+          
+          >
           <Icon type='FontAwesome5' name='edit' style={{color: 'rgb(100,100,0)'}}/>
         </TouchableOpacity>
-        <TouchableOpacity style={{backgroundColor:'rgba(255, 0, 0, 0.4)', height: '100%', width: '50%', justifyContent: 'center', alignItems: 'center'}}>
+        <TouchableOpacity
+          style={{backgroundColor:'rgba(255, 0, 0, 0.4)',
+            height: '100%', width: '50%',
+            justifyContent: 'center', alignItems: 'center'}}
+            onPress={() => {
+              removeReminder(item.id);
+          }}
+            >
         <Icon type='FontAwesome5' name='trash-alt' style={{color: 'red'}}/>
       </TouchableOpacity>
       </Form>
       );
     };
 
+    async function removeReminder(id) {
+      Notifications.cancelScheduledNotificationAsync(id).then(() => {
+        firebase.firestore().collection("users").doc(userId).update({
+          [`notifications.${id}`] : firebase.firestore.FieldValue.delete()
+        })
+      })
+    }
+
     async function addReminder() {
-      if (frequency === "Once") {
-        await scheduleOnce(title, message, date);
+      if (!(title && message)) {
+        alert("Please fill up all fields");
+        return;
+      } else {
+        await scheduleNotification(frequency);
       }
     }
 
-    async function scheduleOnce(title, message, date) {
+    async function scheduleNotification(frequency) {
+      const trigger = triggers()[frequency];
       Notifications.scheduleNotificationAsync({
         content: {
           title,
           body: message
         },
-        trigger: {
-          date
-          // repeats: true,
-          // weekday: 3, //Sunday
-          // hour: 20,
-          // minute: 0
-          // seconds: 2,
-        }
+        trigger
       })
-      .then((identifier) => {
-        const info = {
-          title,
-          message,
-          frequency
-        }
-        firebase.firestore().collection("users").doc(userId).update({
-          [`notifications.${identifier}`]: info
-        }
-        ).then(() => console.log("Success! yay"))
-
+      .then((identifier) => 
+        addToFirebase(identifier)
+      )
+      .then(() => { // success
+        onClose();
+        Toast.show({
+          title: 'Reminder successfully added!',
+        text:
+          '',
+        color: '#2ecc71',
+        timing: 3000,
+        icon: (
+          <Image
+            source={require('../assets/tick.png')}
+            style={{ width: 25, height: 25 }}
+            resizeMode="contain"
+          />)
+        });
       })
       .catch((error) => alert(error));
-      
     }
+
+    function triggers() {
+      return {
+        "Once" : {
+          date
+        },
+        "Daily": {
+          repeats: true,
+          hour: date.getHours(),
+          minute: date.getMinutes()
+        },
+        "Weekly": {
+          repeats: true,
+          weekday: day,
+          hour: date.getHours(),
+          minute: date.getMinutes()
+        }
+      }
+    }
+
+    function addToFirebase(id) {
+      const details = frequency === "Once" ? `On ${displayDate(date)} at ${getTime(date)}`
+        : (frequency === "Daily" ? `Everyday at ${getTime(date)}`
+          : `Every ${getDay(date)} at ${getTime(date)}`)
+      const info = {
+        title,
+        message,
+        frequency,
+        details
+      }
+      firebase.firestore().collection("users").doc(userId).update({
+        [`notifications.${id}`]: info
+      }
+      ).then(() => console.log("Success! yay"))
+    } 
     
     useEffect(() => {
       registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
@@ -262,12 +364,13 @@ onChange={onChange}
                     <Form style={[{ margin: '2%', flexDirection: 'row'}, Platform.OS == 'ios' ? {zIndex: 100} : {}]}>
                       <Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 5, paddingVertical: 10}}>Frequency:</Text>
                       <DropDownPicker
-                      dropDownDirection="BOTTOM"
+                      dropDownDirection="TOP"
                         open={open}
                         value={frequency}
+                        showArrowIcon={false}
                         containerProps={{
                           width: '50%',
-                          marginLeft: 10
+                          marginLeft: 10,
                         }}
                         items={[
                           {label: 'Once', value: 'Once'},
@@ -276,13 +379,13 @@ onChange={onChange}
                         ]}
                         setOpen={setOpen}
                         setValue={setFrequency}
-                        controller={(instance) => dropDownRef.current = instance}
                       />
                     </Form>
                    {frequency === "Once" ? datePicker : null}
-                   {frequency === "Once" ? timePicker : null}
+                   {frequency === "Weekly" ? dayPicker : null}
+                   {frequency ? timePicker : null}
                    {frequency ? <Button
-                                  block onPress={() => addReminder()}
+                                  block style={{marginTop: 5}} onPress={() => addReminder()}
                                 >
                                 <Label style={{fontWeight: 'bold', color: 'white'}}>Add</Label>
                                 </Button>
@@ -313,35 +416,17 @@ onChange={onChange}
        
     
         <Card>
-           <Swipeable renderRightActions={renderRightActions}>
+           <Swipeable renderRightActions={(progress) => renderRightActions(progress, item)}>
           <CardItem style={{flexDirection: 'column'}}>
           <Text style={{flex: 1, fontWeight: 'bold', color: '#0645AD', fontSize: 25, marginBottom: 5}}>{item.title}</Text>
-          <Text style={{flex: 1, fontWeight: 'bold', fontSize: 20, marginBottom: 5}}>{item.message}</Text>
-        <Text style={styles.text}>Fequency: {item.frequency}</Text>
+          <Text style={{flex: 1, fontSize: 20, marginBottom: 5}}>{item.message}</Text>
+        <Text style={styles.text}>{item.details}</Text>
           </CardItem>   
           </Swipeable>           
         </Card>
         
         )} 
     />
-    <Content>
-      <Text>yoyo</Text>
-   
-        <Button
-            onPress={async () => {
-              await scheduleNotification();
-               
-            }}
-        >
-            <Text>Open Popup</Text>
-        </Button>
-        
-          <Button
-          onPress={async () => {
-            await Notifications.cancelAllScheduledNotificationsAsync();
-          }}
-        ><Text>cancel all notif :D</Text></Button>
-          </Content>
           <Footer style={{backgroundColor: '#62B1F6'}}>
             <FooterTab>
               <Button info onPress={() => navigation.navigate("Home")}>
