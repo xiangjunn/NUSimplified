@@ -1,4 +1,4 @@
-import { Container, Content, Footer, FooterTab, Button, Icon, Header, Body, Left, Right, Card, CardItem, Form, Input, Textarea } from 'native-base';
+import { Container, Content, Footer, FooterTab, Button, Icon, Header, Body, Left, Right, Card, CardItem, Form, Input, Textarea, Label } from 'native-base';
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, TouchableOpacity, Platform, Alert, Linking, NativeModules, FlatList, View, Text, Image, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -41,18 +41,43 @@ function RemindersScreen() {
     const notificationListener = useRef();
     const responseListener = useRef();
     const [modalVisible, setModalVisible] = useState(false);
-    const [frequency, setFrequency] = useState(null);
+    const [frequency, setFrequency] = useState('Once');
     const [open, setOpen] = useState(false);
     const [isVisible, setVisible] = useState(false);
-    const [date, setDate] = useState(new Date());   
+    const [date, setDate] = useState(new Date());
+    const [title, setTitle] = useState('');
+    const [message, setMessage] = useState('');   
 
     const onChange = (event, selectedDate) => {
+      console.log(selectedDate);
       const currentDate = selectedDate || date;
       setVisible(Platform.OS === 'ios');
       setDate(currentDate);
     };
 
-    const dateTimePicker =
+    function onClose() { // reset all fields to initial value
+      setTitle('');
+      setMessage('');
+      setFrequency('Once');
+      setDate(new Date());
+      setOpen(false);
+      setModalVisible(!modalVisible);
+    }
+
+    const datePicker =
+    Platform.OS === 'ios'
+    ?  <Form style={{ margin: '2%', flexDirection: 'row', width: '100%'}}>
+    <Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 5, paddingVertical: 10}}>Date:</Text>
+    <Form style={{ flex: 1, padding: 5}}>
+    <DateTimePicker
+    mode="date"
+    minimumDate={new Date()}
+    value={date}
+    onChange={onChange}
+  />
+  </Form>
+  </Form>
+  :
     <Form style={{height: '10%'}}>
     <TouchableOpacity
       onPress={() => setVisible(true)}
@@ -60,11 +85,40 @@ function RemindersScreen() {
       <Text>{displayDate(date)}</Text>
     </TouchableOpacity>
     {isVisible && <DateTimePicker
-      mode="datetime"
+      mode="date"
+      minimumDate={new Date()}
       value={date}
       onChange={onChange}
     />}
-    </Form>
+    </Form>;
+
+const timePicker =
+Platform.OS === 'ios'
+?  <Form style={{ margin: '2%', flexDirection: 'row', width: '100%'}}>
+<Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 5, paddingVertical: 10}}>Time:</Text>
+<Form style={{ flex: 1, padding: 5}}>
+<DateTimePicker
+mode="time"
+minimumDate={new Date()}
+value={date}
+onChange={onChange}
+/>
+</Form>
+</Form>
+:
+<Form style={{height: '10%'}}>
+<TouchableOpacity
+  onPress={() => setVisible(true)}
+  style={{}}>
+  <Text>{displayDate(date)}</Text>
+</TouchableOpacity>
+{isVisible && <DateTimePicker
+  mode="time"
+  minimumDate={new Date()}
+  value={date}
+  onChange={onChange}
+/>}
+</Form>;    
 
     function displayDate(date) {
       return `${convertToDay[date.getDay()]} ${date.getDate()} ${convertToMonth[date.getMonth()]} ${date.getFullYear()}`; 
@@ -77,51 +131,48 @@ function RemindersScreen() {
           <Icon type='FontAwesome5' name='edit' style={{color: 'rgb(100,100,0)'}}/>
         </TouchableOpacity>
         <TouchableOpacity style={{backgroundColor:'rgba(255, 0, 0, 0.4)', height: '100%', width: '50%', justifyContent: 'center', alignItems: 'center'}}>
-        <Icon type='FontAwesome5' name='trash' style={{color: 'red'}}/>
+        <Icon type='FontAwesome5' name='trash-alt' style={{color: 'red'}}/>
       </TouchableOpacity>
       </Form>
       );
     };
 
-    async function scheduleNotification() {
-      console.log(firebase.firestore.Timestamp.now().toDate())
-      const identifier = await Notifications.scheduleNotificationAsync({
+    async function addReminder() {
+      if (frequency === "Once") {
+        await scheduleOnce(title, message, date);
+      }
+    }
+
+    async function scheduleOnce(title, message, date) {
+      Notifications.scheduleNotificationAsync({
         content: {
-          title: "Time's up!",
-          body: 'Change sides!',
+          title,
+          body: message
         },
         trigger: {
+          date
           // repeats: true,
           // weekday: 3, //Sunday
           // hour: 20,
           // minute: 0
-          seconds: 2,
+          // seconds: 2,
         }
-      });
-      const info = {
-        title: "Time's up",
-        body: "BAKANA!",
-        frequency: "Once"
-      }
-      firebase.firestore().collection("users").doc(userId).update({
-        [`notifications.${identifier}`]: info
-      }
-      ).then(() =>  Toast.show({
-        title: 'Profile edited',
-      text:
-        'Your profile has been edited, you can now see your new information.',
-      color: '#f39c12',
-      timing: 2000,
-      icon: (
-        <Image
-          source={require('../assets/warning.png')}
-          style={{ width: 25, height: 25 }}
-          resizeMode="contain"
-        />)
-      }))
-    }
+      })
+      .then((identifier) => {
+        const info = {
+          title,
+          message,
+          frequency
+        }
+        firebase.firestore().collection("users").doc(userId).update({
+          [`notifications.${identifier}`]: info
+        }
+        ).then(() => console.log("Success! yay"))
 
-   
+      })
+      .catch((error) => alert(error));
+      
+    }
     
     useEffect(() => {
       registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
@@ -168,7 +219,7 @@ function RemindersScreen() {
           <Header androidStatusBarColor='#62B1F6' style={{backgroundColor: '#62B1F6'}}>
           <Left>
             <TouchableOpacity onPress={() => navigation.openDrawer()}>
-              
+             <Icon name='menu' style={{color: 'white'}}/>
             </TouchableOpacity>
           </Left>
           <Body/>
@@ -185,7 +236,7 @@ function RemindersScreen() {
         <Form style={styles.centeredView}>
           <Form style={styles.modalView}>
           <Form style={{flex: 1, margin: '2%'}}>
-            <Button rounded onPress={() => setModalVisible(!modalVisible)}  style={{alignSelf: 'flex-end',
+            <Button rounded onPress={() => onClose()}  style={{alignSelf: 'flex-end',
             justifyContent: 'center', aspectRatio: 1, width: '90%', backgroundColor: 'red'}}>
               <Icon name='times' type="FontAwesome5" style={{color: 'black', textAlign: 'center', width: '100%'}}/>
               </Button>
@@ -193,18 +244,31 @@ function RemindersScreen() {
                         <Input
                         placeholder='Title'
                         underlineColorAndroid="transparent"
-                        onChangeText={(text) => {}}
+                        onChangeText={(text) => setTitle(text)}
+                        value={title}
+                        style={{margin: 5}}
                         >
                         </Input>
                     </TouchableOpacity>
-                    <Textarea rowSpan={5} bordered placeholder="Message" style={{borderColor: 'grey', margin: '2%'}}/>
-                    <Form style={[{height: '20%', margin: '2%'}, Platform.OS == 'ios' ? {zIndex: 100} : {}]}>
-                      <Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 5}}>Frequency</Text>
-
+                    <Textarea
+                      rowSpan={5}
+                      bordered
+                      placeholder="Message"
+                      blurOnSubmit={true}
+                      onChangeText={(text) => setMessage(text)}
+                        value={message}
+                      style={{borderColor: 'grey', margin: '2%'}}
+                      />
+                    <Form style={[{ margin: '2%', flexDirection: 'row'}, Platform.OS == 'ios' ? {zIndex: 100} : {}]}>
+                      <Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 5, paddingVertical: 10}}>Frequency:</Text>
                       <DropDownPicker
                       dropDownDirection="BOTTOM"
                         open={open}
                         value={frequency}
+                        containerProps={{
+                          width: '50%',
+                          marginLeft: 10
+                        }}
                         items={[
                           {label: 'Once', value: 'Once'},
                           {label: 'Daily', value: 'Daily'},
@@ -212,12 +276,18 @@ function RemindersScreen() {
                         ]}
                         setOpen={setOpen}
                         setValue={setFrequency}
+                        controller={(instance) => dropDownRef.current = instance}
                       />
                     </Form>
-                   {frequency === "Once" ? dateTimePicker : null}
+                   {frequency === "Once" ? datePicker : null}
+                   {frequency === "Once" ? timePicker : null}
+                   {frequency ? <Button
+                                  block onPress={() => addReminder()}
+                                >
+                                <Label style={{fontWeight: 'bold', color: 'white'}}>Add</Label>
+                                </Button>
+                                : null}
             </Form>
-
-            
             <Form>
   </Form>
           </Form>
@@ -246,7 +316,7 @@ function RemindersScreen() {
            <Swipeable renderRightActions={renderRightActions}>
           <CardItem style={{flexDirection: 'column'}}>
           <Text style={{flex: 1, fontWeight: 'bold', color: '#0645AD', fontSize: 25, marginBottom: 5}}>{item.title}</Text>
-          <Text style={{flex: 1, fontWeight: 'bold', fontSize: 20, marginBottom: 5}}>{item.body}</Text>
+          <Text style={{flex: 1, fontWeight: 'bold', fontSize: 20, marginBottom: 5}}>{item.message}</Text>
         <Text style={styles.text}>Fequency: {item.frequency}</Text>
           </CardItem>   
           </Swipeable>           
