@@ -52,6 +52,15 @@ function HomeScreen() {
                 <Label style={{flex: 1, fontSize: 15, textAlign: 'center', fontWeight: 'bold'}}>{'Bus\nArrival'}</Label>
             </TouchableOpacity>
             </Form>
+            <Label style={{fontSize: 30, color: '#000033', marginHorizontal: 10, marginTop: 50}}>About ActiveNUS</Label>
+            <Label style={{marginHorizontal: 30, marginTop: 20}}>
+            ActiveNUS is an integrated platform which aims to
+            enhance student’s experience and utility (in terms of convenience and efficiency) in university.
+            </Label>
+            <Label style={{fontSize: 30, color: '#000033', marginHorizontal: 10, marginTop: 50}}>Contact us</Label>
+            <Label style={{fontSize: 20, marginHorizontal: 30, marginTop: 20}}>
+            Email: nussimplified@gmail.com
+            </Label>
           </Content>
           <Footer style={{backgroundColor: '#62B1F6'}}>
             <FooterTab>
