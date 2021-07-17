@@ -57,7 +57,9 @@ function AcademicSlotsScreen({ route }) {
                         alert(error);
                     });
                 }
-                const timeslots = selectedSlot.timeslots;
+                const timeslots = selectedSlot.timeslots.map(timeslot => {
+                    return {...timeslot} // clone object so won't mutate original object
+                });
                 const componenentArray = createButtonsComponent(timeslots);
                 setSlotsInfo(componenentArray);
             })

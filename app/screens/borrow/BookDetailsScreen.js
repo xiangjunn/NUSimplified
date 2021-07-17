@@ -58,7 +58,7 @@ export default function BookDetailsScreen({ route, navigation }) {
         } else if (currQuota === 0) {
             Alert.alert("Failed to borrow book", "The book may have already been borrowed by someone else. Please try again.");
         } else if (arr != undefined && arr.length === maxBooksBorrowed) {
-            Alert.alert("Max limit reached!", "You cannot borrow anymore books as you have reached your borrow limit.")
+            Alert.alert("Max limit reached!", "You cannot borrow any more books as you have reached your borrow limit.")
         }
     }
 
