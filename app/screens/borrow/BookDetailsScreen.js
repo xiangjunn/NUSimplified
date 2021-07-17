@@ -147,7 +147,7 @@ export default function BookDetailsScreen({ route, navigation }) {
                 <Text style={{flex: 1, textAlignVertical: 'center', color: '#808080'}}>{showDescription ? 'hide' : 'show'}</Text>
               </TouchableOpacity>
             </Form>
-            <Text style={{flex: 1}}>{showDescription ? book.longDescription : ''}</Text>
+            <Text style={{flex: 1, textAlign: 'justify'}}>{showDescription ? book.longDescription : ''}</Text>
             <Text style={{flex: 1, fontWeight: 'bold', color: '#0645AD', fontSize: 20}}>Additional Details</Text>
             <Form style={{flexDirection: 'row', margin: 3}}>
             <Text style={{flex: 1}}>Published:</Text>
