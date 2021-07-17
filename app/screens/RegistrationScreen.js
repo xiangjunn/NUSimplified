@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native'
 import { firebase } from '../../firebase'
 import { Container, Content, Form, Input, Button, Text, Label, Footer } from 'native-base';
 import { Popup, Toast } from 'popup-ui';
+import { titleCase } from '../backend/functions'
 
 export default function RegistrationScreen() {
     const navigation = useNavigation();
@@ -106,8 +107,8 @@ export default function RegistrationScreen() {
                 const data = {
                     id: uid,
                     email: emailModified,
-                    firstName: firstNameModified,
-                    lastName: lastNameModified
+                    firstName: titleCase(firstNameModified),
+                    lastName: titleCase(lastNameModified)
                 };
                 const usersRef = firebase.firestore().collection('users')
                 usersRef
