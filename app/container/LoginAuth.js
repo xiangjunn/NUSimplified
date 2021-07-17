@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useNavigation } from '@react-navigation/native';
 import { firebase } from '../../firebase'
 import { Content, Form, Item, Input, Icon, Button, Text, Label} from 'native-base';
-import { StyleSheet, Modal, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Modal, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 
 function LoginAuth() {
     const navigation = useNavigation();
@@ -11,9 +11,11 @@ function LoginAuth() {
     const [password, setPassword] = useState('')
     const [passwordSelected, setPasswordSelected] = useState(false)
     const [modalVisible, setModalVisible] = useState(false);
-    const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
+    const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const onLoginPress = () => {
+      setLoading(true);
       firebase
           .auth()
           .signInWithEmailAndPassword(email.toLowerCase().trim(), password)
@@ -26,18 +28,22 @@ function LoginAuth() {
                   .then(firestoreDocument => {
                       if (!firestoreDocument.exists) {
                           alert("User does not exist anymore.")
+                          setLoading(false);
                           return;
                       } else if (!firebase.auth().currentUser.emailVerified) {
                           alert("Email not verified!")
+                          setLoading(false);
                           firebase.auth().signOut()
                       }
                   })
                   .catch(error => {
                       alert(error)
+                      setLoading(false);
                   });
           })
           .catch(error => {
               alert(error)
+              setLoading(false);
           })
     }
 
@@ -91,7 +97,9 @@ function LoginAuth() {
             
               {/** Login button */}
               <Button rounded success style={styles.margin} onPress={() => onLoginPress()}>
-                  <Text style={styles.textAlign} >Login</Text>
+              {loading ? <ActivityIndicator animating={true} size="large" style={{flex: 1, alignSelf: 'center'}} color="#999999" />
+                :  <Text style={styles.textAlign} >Login</Text>
+              }
               </Button>
                 
               {/** Signup button */}
