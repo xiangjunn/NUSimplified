@@ -73,9 +73,7 @@ function SlotsScreen({ route, navigation }) {
                     });
                 }
                 const courts = selectedSlot.courts;
-                const cloneCourts = courts.map(court => {
-                    return { ...court }; // clone object so won't mutate original object
-                });
+                const cloneCourts = JSON.parse(JSON.stringify(courts));
                 let index = -1; // because increment before calling function, so first index will be 0
                 const componenentArray = cloneCourts.map(
                     court => {
