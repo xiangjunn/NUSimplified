@@ -73,11 +73,14 @@ function SlotsScreen({ route, navigation }) {
                     });
                 }
                 const courts = selectedSlot.courts;
+                const cloneCourts = courts.map(court => {
+                    return { ...court }; // clone object so won't mutate original object
+                });
                 let index = -1; // because increment before calling function, so first index will be 0
-                const componenentArray = courts.map(
+                const componenentArray = cloneCourts.map(
                     court => {
                         index++
-                        return createCourtComponent(court, courts, index)
+                        return createCourtComponent(court, cloneCourts, index)
                     });
                 setSlotsInfo(componenentArray);
             })
@@ -115,6 +118,7 @@ function SlotsScreen({ route, navigation }) {
                                 if (currSlot.isAvailable) {
                                     const period = currSlot.isPeak ? "Period: Peak" : "Period: Non-peak";
                                     const body = "Court selected: " + court.courtNumber
+                                                    + "\nDate: " + dateToString(date)
                                                     + "\nTimeslot selected: " + currSlot.time + "\n" + period
                                                     + "\n\nProceed to book?";
                                     Alert.alert(name, body, [
