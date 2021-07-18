@@ -81,7 +81,7 @@ function AcademicSlotsScreen({ route }) {
                             style={[{width: '23%', marginHorizontal: '1%'}, currSlot.isAvailable ? styles.available : styles.unavailable]}
                             onPress={() => {
                                 if (currSlot.isAvailable) {
-                                    const body =  "Date: " + dateToString(date)
+                                    const body =  "Date: " + date
                                                     + "Timeslot selected: " + currSlot.time
                                                     + "\n\nProceed to book?";
                                     Alert.alert(venue, body, [

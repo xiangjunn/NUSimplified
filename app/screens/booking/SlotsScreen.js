@@ -118,7 +118,7 @@ function SlotsScreen({ route, navigation }) {
                                 if (currSlot.isAvailable) {
                                     const period = currSlot.isPeak ? "Period: Peak" : "Period: Non-peak";
                                     const body = "Court selected: " + court.courtNumber
-                                                    + "\nDate: " + dateToString(date)
+                                                    + "\nDate: " + date
                                                     + "\nTimeslot selected: " + currSlot.time + "\n" + period
                                                     + "\n\nProceed to book?";
                                     Alert.alert(name, body, [
