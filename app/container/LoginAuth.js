@@ -27,22 +27,32 @@ function LoginAuth() {
                   .get()
                   .then(firestoreDocument => {
                       if (!firestoreDocument.exists) {
-                          alert("User does not exist anymore.")
+                          Alert.alert("User does not exist anymore.")
                           setLoading(false);
                           return;
                       } else if (!firebase.auth().currentUser.emailVerified) {
-                          alert("Email not verified!")
+                          Alert.alert("Email not verified!")
                           setLoading(false);
                           firebase.auth().signOut()
                       }
                   })
                   .catch(error => {
-                      alert(error)
+                      Alert.alert(error.message);
                       setLoading(false);
                   });
           })
           .catch(error => {
-              alert(error)
+              if (!email || !password) {
+                Alert.alert('Email or password is not filled in')
+              } else if (!email.toLowerCase().trim().endsWith('@u.nus.edu')) {
+                Alert.alert('This is not a NUS email')
+              } else if (email && error.message.includes('no user record')) {
+                Alert.alert('Email is not registered. Please register an account.')
+              } else if (password && error.message.includes('password is invalid')) {
+                Alert.alert('The password is invalid')
+              } else {
+                Alert.alert(error.message)
+              }            
               setLoading(false);
           })
     }
@@ -55,7 +65,7 @@ function LoginAuth() {
           setModalVisible(!modalVisible);
         })
         .catch((error) => {
-          alert(error);
+          Alert.alert(error.message);
         });
     }
 
@@ -91,24 +101,25 @@ function LoginAuth() {
               </Item>
 
               {/** "Forget password" button */}
-              <TouchableOpacity style={{height: 35, marginTop: 5}} onPress={() => setModalVisible(!modalVisible)}>
+              <TouchableOpacity testID='forgotPassword' style={{height: 35, marginTop: 5}} onPress={() => setModalVisible(!modalVisible)}>
                   <Label style={{color: '#0645AD', marginLeft: 10}}>Forgot password?</Label>
               </TouchableOpacity>
             
               {/** Login button */}
-              <Button rounded success style={styles.margin} onPress={() => onLoginPress()}>
+              <Button testID='login' rounded success style={styles.margin} onPress={() => onLoginPress()}>
               {loading ? <ActivityIndicator animating={true} size="large" style={{flex: 1, alignSelf: 'center'}} color="#999999" />
                 :  <Text style={styles.textAlign} >Login</Text>
               }
               </Button>
                 
               {/** Signup button */}
-              <Button rounded style={styles.margin} onPress={() => navigation.replace("Signup")}>
+              <Button testID='signUp' rounded style={styles.margin} onPress={() => navigation.replace("Signup")}>
                   <Text style={styles.textAlign} >Sign up</Text>
               </Button>
             </Form>
 
             <Modal
+        testID='modal'
         animationType="slide"
         transparent={true}
         visible={modalVisible}
