@@ -1,7 +1,6 @@
 import React from 'react';
-import { fireEvent, render, waitFor, cleanup, act, unmount } from '@testing-library/react-native';
+import { fireEvent, render, waitFor, cleanup } from '@testing-library/react-native';
 import { Alert } from 'react-native';
-import { mocksdk } from '../app/backend/mockFirebase';
 import LoginScreen from '../app/screens/LoginScreen';
 import LoginAuth from '../app/container/LoginAuth';
 import { SAMPLE_EMAIL, SAMPLE_PASSWORD, SAMPLE_EMAIL_UNVERIFIED, SAMPLE_PASSWORD_UNVERIFIED } from '@env'
@@ -24,10 +23,6 @@ jest.mock("@react-navigation/native", () => {
       }),
     };
 });
-
-// jest.mock('firebase', () => {
-//   return mocksdk;
-// })
 
 window.addEventListener = jest.fn();
 window.attachEvent= jest.fn();

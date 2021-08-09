@@ -1,7 +1,7 @@
 import React from 'react';
-import { fireEvent, render, waitFor, cleanup, act, unmount } from '@testing-library/react-native';
+import { fireEvent, render, waitFor, cleanup } from '@testing-library/react-native';
 import DeclareTempScreen from '../app/screens/DeclareTempScreen';
-import { SAMPLE_EMAIL, SAMPLE_PASSWORD, SAMPLE_EMAIL_UNVERIFIED, SAMPLE_PASSWORD_UNVERIFIED } from '@env'
+import { SAMPLE_EMAIL, SAMPLE_PASSWORD } from '@env'
 import { firebase } from '../firebase'
 
 afterEach(() => {    

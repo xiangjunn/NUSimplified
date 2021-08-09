@@ -75,7 +75,7 @@ function DeclareTempScreen() {
             <Input
                   onChangeText={(text) => update(text)}
                   value={input}
-                  keyboardType='number-pad'
+                  keyboardType='decimal-pad'
                   maxLength={4}
                   style={{fontSize: 100, height: 150, alignSelf: 'center', marginBottom: 50}}
                   >
